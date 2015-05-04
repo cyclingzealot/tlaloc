@@ -1,0 +1,20 @@
+
+# We are tweeting either:
+# Current and worst for the day
+# Current and worst for tomorrow
+
+# Lets start with the first (current and worst for the day)
+
+# Get the last file of http://dd.weather.gc.ca/nowcasting/matrices/
+# Unzip it (or uncompress it http://pubs.opengroup.org/onlinepubs/9699919799/utilities/compress.html)
+
+# Get the line with STN: CYOW and the next 29 lines
+# Keep 7th line until the time is 2 AM Zulu
+
+# From the 7th line (current), record the temperature (14th column T) and precipiration (5th column)
+# See http://dd.weather.gc.ca/nowcasting/doc/README_nowcasting_prevision-immediate.txt
+
+# In all the other lines until 2 AM Zulu, see what is the maximum POP in column 11 and minimum temperature (T, in column 14)
+
+# tweet it .  Together or worst weather if necessary
+

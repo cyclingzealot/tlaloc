@@ -40,7 +40,7 @@ chmod 600 $log
 #fi
 
 
-echo Begin `date`  .....
+echo Begin `date`  ..... > $log
 
 ### BEGIN SCRIPT ###############################################################
 
@@ -58,7 +58,7 @@ latestPath=$workDir/latest.txt
 # Get the last file of http://dd.weather.gc.ca/nowcasting/matrices/
 fileURL=`lynx --dump http://dd.weather.gc.ca/nowcasting/matrices/ | tail -n 1 | cut -d ' ' -f 4`
 # Unzip it (or uncompress it http://pubs.opengroup.org/onlinepubs/9699919799/utilities/compress.html)
-curl $fileURL | gzip -dc | grep $city -A 28 > $latestPath
+curl -s $fileURL | gzip -dc | grep $city -A 28 > $latestPath
 
 # Keep 7th line until the time is 2 AM Zulu
 currentLine=`head -n 12 $latestPath | tail -n 1`
@@ -71,9 +71,27 @@ currentPrecip="$(echo -e "${currentPrecip}" | tr -d '[[:space:]]')"
 if [[ -z "$currentPrecip" ]]; then currentPrecip='none'; fi
 
 # In all the other lines until 2 AM Zulu, see what is the maximum POP in column 11 and minimum temperature (T, in column 14)
+minTemp=1000; 
+for temp in `cat $latestPath  | grep -v '^-' | grep -v T | cut -d '|' -f 13`  ; do 
+	temp=`echo $temp | tr -d '[[:space:]]' | cut -d . -f 1` ; 
+
+	if [[ "$temp" -lt "$minTemp" ]]; then 
+		minTemp="$temp"; 
+	fi ; 
+done; 
+
+
+maxPOP=0; 
+for pop in `cat $latestPath  | grep -v '^-' | grep -v T | cut -d '|' -f 10`  ; do 
+	pop=`echo $pop | tr -d '[[:space:]]' | cut -d . -f 1` ; 
+
+	if [[ "$pop" -gt "$maxPOP" ]]; then 
+		maxPOP="$pop"; 
+	fi ; 
+done; 
 
 # tweet it .  Together or worst weather if necessary
-announce="Current: T: $currentTemp; P: $currentPrecip"
+announce="Current: T: $currentTemp, P: $currentPrecip; Worst: T: $minTemp; P: $maxPOP"
 
 if [[ "${#announce}" -gt 140 ]] ; then 
 	>&2 echo "Announce string longer then 140 latin chars"
@@ -87,5 +105,6 @@ echo $announce
 
 END=$(date +%s.%N)
 DIFF=$(echo "$END - $START" | bc)
-echo Done.  `date` - $DIFF seconds
+echo Done.  `date` - $DIFF seconds > $log
+echo $DIFF seconds
 

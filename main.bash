@@ -82,16 +82,29 @@ done;
 
 
 maxPOP=0; 
-for pop in `cat $latestPath  | grep -v '^-' | grep -v T | cut -d '|' -f 10`  ; do 
+counter=1
+announcePOP=''
+
+for pop in `cat $latestPath  | grep -v '^-' | grep -v T | cut -d '|' -f 10 | tail -n 12`  ; do 
 	pop=`echo $pop | tr -d '[[:space:]]' | cut -d . -f 1` ; 
 
-	if [[ "$pop" -gt "$maxPOP" ]]; then 
+	if [ "$pop" -gt "$maxPOP" ]; then 
 		maxPOP="$pop"; 
-	fi ; 
+	fi  
+
+	if [ "$pop" -gt 50 ]; then
+		time=`cat $latestPath  | grep -v '^-' | grep -v T | cut -d '|' -f 1 | tail -n 12 | cut -d ' ' -f 2 | head -n $counter | tail -n 1 | cut -c 1-2` 
+		time=`echo $time - 4 | bc  `
+		announcePOP=`echo "$announcePOP$time: $pop; "`
+	fi
+
+	let counter++
+
 done; 
 
 # tweet it .  Together or worst weather if necessary
 announce="Current: T: $currentTemp, P: $currentPrecip; Worst: T: $minTemp; P: $maxPOP"
+
 
 if [[ "${#announce}" -gt 140 ]] ; then 
 	>&2 echo "Announce string longer then 140 latin chars"
@@ -99,6 +112,9 @@ fi
 
 echo $announce
 
+if  [ ! -z "$announcePOP" ]; then 
+	echo $announcePOP
+fi
 
 
 ### END SCIPT ##################################################################

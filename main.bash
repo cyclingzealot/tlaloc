@@ -95,6 +95,7 @@ for pop in `cat $latestPath  | grep -v '^-' | grep -v T | cut -d '|' -f 10 | tai
 	if [ "$pop" -gt 50 ]; then
 		time=`cat $latestPath  | grep -v '^-' | grep -v T | cut -d '|' -f 1 | tail -n 12 | cut -d ' ' -f 2 | head -n $counter | tail -n 1 | cut -c 1-2` 
 		time=`echo $time - 4 | bc  `
+		if [ "$time" -lt 0 ] ; then time=`echo $time + 24 | bc  `; fi
 		announcePOP=`echo "$announcePOP$time: $pop; "`
 	fi
 

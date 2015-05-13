@@ -27,8 +27,8 @@ configFile='~/.binJlam/templateConfig'
 
 #Capture everything to log
 log=~/log/$__base-${ts}.log
-exec >  >(tee -a $log)
-exec 2> >(tee -a $log >&2)
+#exec >  >(tee -a $log)
+#exec 2> >(tee -a $log >&2)
 touch $log
 chmod 600 $log
 
@@ -39,8 +39,6 @@ chmod 600 $log
 #        exit 1
 #fi
 
-
-echo Begin `date`  ..... > $log
 
 ### BEGIN SCRIPT ###############################################################
 

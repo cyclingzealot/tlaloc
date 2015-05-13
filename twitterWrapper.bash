@@ -69,7 +69,7 @@ printf $fileURL > $latestDataPath
 $__dir/main.bash | sed '$ d' > $twitterMsg
 
 # Tweeter chaque ligne
-
+cat $twitterMsg | xargs echo 
 
 
 ### END SCIPT ##################################################################

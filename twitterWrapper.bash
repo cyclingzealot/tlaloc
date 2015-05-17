@@ -71,6 +71,8 @@ $__dir/main.bash | sed '$ d' > $twitterMsg
 # Tweeter chaque ligne
 cat $twitterMsg | xargs echo 
 
+# Voir https://dev.twitter.com/rest/reference/post/statuses/update pour l'API
+
 
 ### END SCIPT ##################################################################
 

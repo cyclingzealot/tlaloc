@@ -102,7 +102,7 @@ for pop in `cat $latestPath  | grep -v '^-' | grep -v T | cut -d '|' -f 10 | tai
 done; 
 
 # tweet it .  Together or worst weather if necessary
-announce="Current: T: $currentTemp, P: $currentPrecip; Worst: T: $minTemp; P: $maxPOP"
+announce="Current/Worst: T: $currentTemp/$minTemp, P: $currentPrecip/$maxPOP;"
 
 
 if [[ "${#announce}" -gt 140 ]] ; then 

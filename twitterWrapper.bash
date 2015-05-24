@@ -9,7 +9,7 @@ set -o errexit
 set -o nounset
 
 #(a.k.a set -x) to trace what gets executed
-set -o xtrace
+#set -o xtrace
 
 # in scripts to catch mysqldump fails 
 set -o pipefail
@@ -73,6 +73,8 @@ cat $twitterMsg | xargs echo
 
 # Voir https://dev.twitter.com/rest/reference/post/statuses/update pour l'API
 # Voir https://dev.twitter.com/overview/api/twitter-libraries pour des librairies en Python ou perl
+# Voir https://dev.twitter.com/rest/tools/console pour console pour tester
+# Voir https://www.bentasker.co.uk/documentation/development-programming/23-howto-tweet-from-bash-scripts-using-oauth
 
 
 ### END SCIPT ##################################################################

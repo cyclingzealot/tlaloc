@@ -68,7 +68,8 @@ currentPrecip=`echo $currentLine | cut -d '|' -f 4`
 currentPrecip="$(echo -e "${currentPrecip}" | tr -d '[[:space:]]')"
 if [[ -z "$currentPrecip" ]]; then currentPrecip='none'; fi
 
-if [[ "$currentPrecip" == "none" &&  `echo "$currentTemp > 19 && $currentTemp < 24" | bc `=="1" ]]; then
+set -x
+if [[ "$currentPrecip" == "none" &&  `echo "$currentTemp > 19 && $currentTemp < 24" | bc ` -eq "1" ]]; then
 	notice="Température $currentTemp.  Ouvrir fenêtre?"
 else
 	notice="Température $currentTemp, précipitation $currentPrecip.  Fermer fenêtre?"

@@ -59,13 +59,11 @@ sunset = sunsetStr.split(' ').last.strip
 
 
 
-announceStr="Current/Worst: T: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}\n"
+announceStr="Current/Worst: T: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}    \n"
 
 forecasts.each { |f|
     announceStr += "#{f.hour}: #{f.pop}; " if f.pop >= 30
 }
-
-announceStr += "Sunset: #{sunset}"
 
 announceStr.strip!
 

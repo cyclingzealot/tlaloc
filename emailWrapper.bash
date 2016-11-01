@@ -11,7 +11,7 @@ set -o nounset
 #(a.k.a set -x) to trace what gets executed
 set -o xtrace
 
-# in scripts to catch mysqldump fails 
+# in scripts to catch mysqldump fails
 set -o pipefail
 
 # Set magic variables for current file & dir
@@ -45,7 +45,7 @@ echo Begin `date`  .....
 ### BEGIN SCRIPT ###############################################################
 
 
-$__dir/main.bash $1 | mail -s "Météo `date -R`" $2
+$__dir/tlaloc.rb $1 | mail -s "Météo `date -R`" $2
 
 
 

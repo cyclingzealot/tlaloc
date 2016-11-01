@@ -47,5 +47,9 @@ class Forecast
         return @pcpType
     end
 
+    def hour()
+        return @hour
+    end
+
 
 end

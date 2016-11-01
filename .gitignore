@@ -1,1 +1,4 @@
 .*.sw?
+.latestURL.txt
+.twitterMsg.txt
+.byebug_history

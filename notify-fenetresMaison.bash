@@ -11,7 +11,7 @@ set -o nounset
 #(a.k.a set -x) to trace what gets executed
 #set -o xtrace
 
-# in scripts to catch mysqldump fails
+# in scripts to catch mysqldump fails 
 set -o pipefail
 
 # Set magic variables for current file & dir
@@ -68,55 +68,17 @@ currentPrecip=`echo $currentLine | cut -d '|' -f 4`
 currentPrecip="$(echo -e "${currentPrecip}" | tr -d '[[:space:]]')"
 if [[ -z "$currentPrecip" ]]; then currentPrecip='none'; fi
 
-# In all the other lines until 2 AM Zulu, see what is the maximum POP in column 11 and minimum temperature (T, in column 14)
-minTemp=1000;
-for temp in `cat $latestPath  | grep -v '^-' | grep -v T | cut -d '|' -f 13`  ; do
-	temp=`echo $temp | tr -d '[[:space:]]' | cut -d . -f 1` ;
-
-	if [[ "$temp" -lt "$minTemp" ]]; then
-		minTemp="$temp";
-	fi ;
-done;
-
-
-maxPOP=0;
-counter=1
-announcePOP=''
-
-for pop in `cat $latestPath  | grep -v '^-' | grep -v T | cut -d '|' -f 10 | tail -n 12`  ; do
-	pop=`echo $pop | tr -d '[[:space:]]' | cut -d . -f 1` ;
-
-	if [ "$pop" -gt "$maxPOP" ]; then
-		maxPOP="$pop";
-	fi
-
-	if [ "$pop" -gt 50 ]; then
-		time=`cat $latestPath  | grep -v '^-' | grep -v T | cut -d '|' -f 1 | tail -n 12 | cut -d ' ' -f 2 | head -n $counter | tail -n 1 | cut -c 1-2`
-		time=`echo $time - 4 | bc  `
-		if [ "$time" -lt 0 ] ; then time=`echo $time + 24 | bc  `; fi
-		announcePOP=`echo "$announcePOP$time: $pop; "`
-	fi
-
-	let counter++
-
-done;
-
-# tweet it .  Together or worst weather if necessary
-announce="Current/Worst: T: $currentTemp/$minTemp, P: $currentPrecip/$maxPOP;"
-
-
-if [[ "${#announce}" -gt 140 ]] ; then
-	>&2 echo "Announce string longer then 140 latin chars"
+set -x
+if [[ "$currentPrecip" == "none" &&  `echo "$currentTemp > 19 && $currentTemp < 24" | bc ` -eq "1" ]]; then
+	notice="Température $currentTemp.  Ouvrir fenêtre?"
+else
+	notice="Température $currentTemp, précipitation $currentPrecip.  Fermer fenêtre?"
 fi
 
-echo $announce
-
-if  [ ! -z "$announcePOP" ]; then
-	echo $announcePOP
-fi
-
-#ls -l $latestPath
-
+export DISPLAY=:0.0 && export XAUTHORITY=/home/ravi/.Xauthority
+notify-send "$notice"
+echo "$notice"
+	
 
 ### END SCIPT ##################################################################
 

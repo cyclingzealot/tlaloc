@@ -2,6 +2,7 @@
 
 require 'nokogiri'
 require 'open-uri'
+require 'cachy'
 #require 'byebug'
 
 require_relative './forecast.rb'
@@ -19,12 +20,15 @@ end
 
 # Get the last file of http://dd.weather.gc.ca/nowcasting/matrices/
 
-urlBase='http://dd.weather.gc.ca/nowcasting/matrices/'
+f = File.open("/tmp/tlalocCache.#{city}.txt", 'w')
 
-#doc = Nokogiri::HTML(open(urlBase))
-fileURL=`lynx --dump #{urlBase} | tail -n 1 | cut -d ' ' -f 4`.chomp
+Cachy.cache_store = f
 
-data=`curl -s #{fileURL} | gzip -dc | grep #{city} -A 28`
+data=Cachy.cache(city, :expires_in => 10/60/24) {
+    urlBase='http://dd.weather.gc.ca/nowcasting/matrices/'
+    fileURL=`lynx --dump #{urlBase} | tail -n 1 | cut -d ' ' -f 4`.chomp
+    `curl -s #{fileURL} | gzip -dc | grep #{city} -A 28`
+}
 
 # Keep 7th line of data (12th line of output) until the time is 2 AM Zulu
 currentLine=data.split("\n")[11]

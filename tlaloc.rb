@@ -2,12 +2,12 @@
 
 require 'nokogiri'
 require 'open-uri'
+require 'cachy'
 require 'byebug'
 require 'getoptlong'
 
 
 require_relative './forecast.rb'
-
 
 ### BEGIN SCRIPT ###############################################################
 
@@ -42,14 +42,16 @@ opts.each do |opt, arg|
 end
 
 
-# Get the last file of http://dd.weather.gc.ca/nowcasting/matrices/
-urlBase='http://dd.weather.gc.ca/nowcasting/matrices/'
 
-fileURL=`lynx --dump #{urlBase} | tail -n 1 | cut -d ' ' -f 4`.chomp
+f = File.open("/tmp/tlalocCache.#{city}.txt", 'w')
+Cachy.cache_store = f
 
-data=`curl -s #{fileURL} | gzip -dc | grep #{city} -A 28`
-
-data.split("\n").each {|l| puts l} if debug
+data=Cachy.cache(city, :expires_in => 10/60/24) {
+	# Get the last file of http://dd.weather.gc.ca/nowcasting/matrices/
+    urlBase='http://dd.weather.gc.ca/nowcasting/matrices/'
+    fileURL=`lynx --dump #{urlBase} | tail -n 1 | cut -d ' ' -f 4`.chomp
+    `curl -s #{fileURL} | gzip -dc | grep #{city} -A 28`
+}
 
 # Keep 7th line of data (12th line of output) until the time is 2 AM Zulu
 currentLine=data.split("\n")[11]
@@ -181,7 +183,3 @@ else
 
     puts "String length is #{finalStr.length}"
 end
-
-
-
-

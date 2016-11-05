@@ -37,7 +37,7 @@ class Forecast
 
 
     def windChill()
-        return (13.12 + 0.6215*@temp - 11.37*@wind**0.16 + 0.3965*@temp*@wind**0.16).floor
+        return (13.12 + 0.6215*@temp - 11.37*@wind**0.16 + 0.3965*@temp*@wind**0.16).round
     end
 
     def pop()

@@ -26,6 +26,8 @@ fileURL=`lynx --dump #{urlBase} | tail -n 1 | cut -d ' ' -f 4`.chomp
 
 data=`curl -s #{fileURL} | gzip -dc | grep #{city} -A 28`
 
+#puts data
+
 # Keep 7th line of data (12th line of output) until the time is 2 AM Zulu
 currentLine=data.split("\n")[11]
 

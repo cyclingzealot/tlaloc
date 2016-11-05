@@ -2,7 +2,7 @@
 
 require 'nokogiri'
 require 'open-uri'
-#require 'byebug'
+require 'byebug'
 
 require_relative './forecast.rb'
 
@@ -32,6 +32,8 @@ data=`curl -s #{fileURL} | gzip -dc | grep #{city} -A 28`
 currentLine=data.split("\n")[11]
 
 current = Forecast.new(currentLine)
+
+#debugger
 
 forecastStrings=data.split("\n")
 

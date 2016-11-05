@@ -37,7 +37,11 @@ class Forecast
 
 
     def windChill()
-        return (13.12 + 0.6215*@temp - 11.37*@wind**0.16 + 0.3965*@temp*@wind**0.16).round
+        if (@temp <= 10 and @wind > 4.8)
+            return [(13.12 + 0.6215*@temp - 11.37*@wind**0.16 + 0.3965*@temp*@wind**0.16).round, @temp].min
+        else
+            return @temp
+        end
     end
 
     def pop()
@@ -46,6 +50,10 @@ class Forecast
 
     def temp()
         return @temp
+    end
+
+    def wind()
+        return @wind
     end
 
     def pcpType()

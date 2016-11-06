@@ -3,37 +3,50 @@
 require 'nokogiri'
 require 'open-uri'
 require 'byebug'
+require 'getoptlong'
+
 
 require_relative './forecast.rb'
 
+
 ### BEGIN SCRIPT ###############################################################
+
+opts = GetoptLong.new(
+  [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+  [ '--city', '-c', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--twitter', '-t', GetoptLong::NO_ARGUMENT ]
+)
 
 
 city='YOW'
+twitter=false
 
-if ! ARGV[0].nil?
-    city=ARGV[0]
+opts.each do |opt, arg|
+  case opt
+    when '--city'
+        city=arg
+    when '--twitter'
+        twitter=true
+    else
+        puts "[-c|--city {$city}] [-t|--twitter]"
+        puts "[-t|--twitter] Push output to twitter"
+        puts "[-h|--help] Show this help screen"
+        exit 1
+  end
 end
 
-# Lets start with the first (current and worst for the day)
 
 # Get the last file of http://dd.weather.gc.ca/nowcasting/matrices/
-
 urlBase='http://dd.weather.gc.ca/nowcasting/matrices/'
 
-#doc = Nokogiri::HTML(open(urlBase))
 fileURL=`lynx --dump #{urlBase} | tail -n 1 | cut -d ' ' -f 4`.chomp
 
 data=`curl -s #{fileURL} | gzip -dc | grep #{city} -A 28`
-
-#puts data
 
 # Keep 7th line of data (12th line of output) until the time is 2 AM Zulu
 currentLine=data.split("\n")[11]
 
 current = Forecast.new(currentLine)
-
-#debugger
 
 forecastStrings=data.split("\n")
 
@@ -50,84 +63,70 @@ minWindChill=forecasts.min_by {|f| f.windChill}.windChill
 
 minTemp=forecasts.min_by {|f| f.temp}.temp
 
-=begin
-puts maxPop
-puts minWindChill
-puts minTemp
-=end
-
-#Get sunset times
-sunsetStr=`curl -s http://www.cmpsolv.com/cgi-bin/sunset?loc=#{city} | grep 'Sunset:'`.strip
-
-sunset = sunsetStr.split(' ').last.strip
-
-
-
-announceStr="Current/Worst: T: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}    \n"
-
-forecasts.each { |f|
-    announceStr += "#{f.hour}: #{f.pop}; " if f.pop >= 30
-}
-
-announceStr.strip!
+untilHour=forecasts.max_by {|f| f.dateTime}.hour
 
 
 ## Get sunset at
 ## http://www.cmpsolv.com/cgi-bin/sunset?loc=YOW
+sunsetStr=`curl -s http://www.cmpsolv.com/cgi-bin/sunset?loc=#{city} | grep 'Sunset:'`.strip
+sunset = sunsetStr.split(' ').last.strip
 
-puts announceStr
+announceStr="Current/Worst: Windchil: #{current.windChill}/#{minWindChill}, POP: #{current.pcpType}/#{maxPop}; Sunset: #{sunset}\n"
 
+popStr=''
+i=0
+forecasts.each { |f|
+    if f.pop >= 30
+        i += 1
+        if i==1
+            popStr = "#{f.hour}:00: #{f.pop}%; "
+        else
+            popStr = "#{f.hour}: #{f.pop}; "
+        end
+    end
+}
 
+i=0
+if twitter
+    announceStr = "Your #ottbike #ottweather until #{untilHour}:59: " + announceStr
 
+	if (announceStr + popStr).length > 140
+	    announceStr="Current/Worst: Wc: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}\n"
+	    announceStr = "#ottbike #ottweather until #{untilHour}:59: " + announceStr
+	    forecasts.each { |f|
+		    if f.pop >= 30
+		        i += 1
+		        if i==1
+		            popStr = "POP > 30%: #{f.hour}:00"
+		        else
+		            popStr = "; #{f.hour}"
+		        end
+	        end
+	    }
+	end
 
-=begin
-	pop=`echo $pop | tr -d '[[:space:]]' | cut -d . -f 1` ;
-
-	if [ "$pop" -gt "$maxPOP" ]; then
-		maxPOP="$pop";
-	fi
-
-	if [ "$pop" -gt 50 ]; then
-		time=`cat $latestPath  | grep -v '^-' | grep -v T | cut -d '|' -f 1 | tail -n 12 | cut -d ' ' -f 2 | head -n $counter | tail -n 1 | cut -c 1-2`
-		time=`echo $time - 4 | bc  `
-		if [ "$time" -lt 0 ] ; then time=`echo $time + 24 | bc  `; fi
-		announcePOP=`echo "$announcePOP$time: $pop; "`
-	fi
-
-	let counter++
-
-done;
-
-# tweet it .  Together or worst weather if necessary
-announce="Current/Worst: T: $currentTemp/$minTemp, P: $currentPrecip/$maxPOP;"
-
-
-if [[ "${#announce}" -gt 140 ]] ; then
-	>&2 echo "Announce string longer then 140 latin chars"
-fi
-
-echo $announce
-
-if  [ ! -z "$announcePOP" ]; then
-	echo $announcePOP
-fi
-
-ls -l $latestPath
-
-
-### END SCIPT ##################################################################
-
-END=$(date +%s.%N)
-DIFF=$(echo "$END - $START" | bc)
-echo Done.  `date` - $DIFF seconds > $log
-echo $DIFF seconds
+end
 
 
-puts current
-puts current.windChill()
+announceStr += popStr
+announceStr.strip!
 
-data.split("\n").each {|l| puts l}
-debugger
-nil
-=end
+unless twitter
+    puts announceStr
+else
+    require_relative './twitterConfig.rb'
+	client = Twitter::REST::Client.new($clientConf)
+
+	if client
+	   puts "Client ready"
+       client.update(announceStr) or puts "Update fail?"
+       puts "Announced!"
+	else
+	    $stderr.puts "Client error"
+	    exit 1
+	end
+end
+
+
+
 

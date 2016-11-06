@@ -1,4 +1,6 @@
 require 'byebug'
+require 'twitter'
+
 
 class Forecast
 
@@ -6,7 +8,7 @@ class Forecast
     @wind = nil
     @pcpType = nil
     @pop     = nil
-    @hour   = nil
+    @dateTime = nil
 
     def initialize(line)
     # From the 7th line (current), record the temperature (14th column T) and precipiration (5th column)
@@ -16,9 +18,10 @@ class Forecast
         @pcpType = parts[3].strip
         @wind = parts[15].strip.to_i
 
-        @hour = parts[0].strip.split(' ')[1].strip[0,2].to_i - 4
-
-        @hour += 24 if @hour < 0
+        hourNum = parts[0].strip.split(' ')[1].strip[0,2].to_i
+        n = DateTime.now
+        @dateTime = DateTime.new(n.year, n.month, n.day, hourNum, n.minute, n.second)
+        @dateTime -= 4/24
 
         @pcpType = 'none' if @pcpType.nil? or @pcpType.empty?
 
@@ -37,6 +40,7 @@ class Forecast
 
 
     def windChill()
+        # See https://en.wikipedia.org/wiki/Wind_chill#North_American_and_United_Kingdom_wind_chill_index
         if (@temp <= 10 and @wind > 4.8)
             return [(13.12 + 0.6215*@temp - 11.37*@wind**0.16 + 0.3965*@temp*@wind**0.16).round, @temp].min
         else
@@ -60,8 +64,12 @@ class Forecast
         return @pcpType
     end
 
+    def dateTime()
+        return @dateTime
+    end
+
     def hour()
-        return @hour
+        return @dateTime.hour
     end
 
 

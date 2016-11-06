@@ -26,6 +26,7 @@ opts.each do |opt, arg|
     when '--city'
         city=arg
     when '--twitter'
+        require_relative './twitterConfig.rb'
         twitter=true
     else
         puts "[-c|--city {$city}] [-t|--twitter]"
@@ -114,13 +115,14 @@ announceStr.strip!
 unless twitter
     puts announceStr
 else
-    require_relative './twitterConfig.rb'
 	client = Twitter::REST::Client.new($clientConf)
 
 	if client
 	   puts "Client ready"
-       client.update(announceStr) or puts "Update fail?"
+       r = client.update(announceStr) or puts "Update fail?"
        puts "Announced!"
+       puts r.url
+       puts announceStr
 	else
 	    $stderr.puts "Client error"
 	    exit 1

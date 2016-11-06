@@ -21,9 +21,8 @@ class Forecast
         @pcpType = parts[3].strip
         @wind = parts[15].strip.to_i
 
-        hourNum = parts[0].strip.split(' ')[1].strip[0,2].to_i
-        n = DateTime.now
-        @dateTime = DateTime.new(n.year, n.month, n.day, hourNum, 0, 0, "+0")
+        dateTimeStr = parts[0].strip
+        @dateTime = DateTime.strptime("#{dateTimeStr} +0000", "%Y%m%d %H%M %z")
 
         @pcpType = 'none' if @pcpType.nil? or @pcpType.empty?
 

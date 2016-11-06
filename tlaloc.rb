@@ -14,12 +14,14 @@ require_relative './forecast.rb'
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--city', '-c', GetoptLong::REQUIRED_ARGUMENT ],
-  [ '--twitter', '-t', GetoptLong::NO_ARGUMENT ]
+  [ '--twitter', '-t', GetoptLong::NO_ARGUMENT ],
+  [ '--debug', '-d', GetoptLong::NO_ARGUMENT ]
 )
 
 
 city='YOW'
 twitter=false
+debug=false
 
 opts.each do |opt, arg|
   case opt
@@ -28,6 +30,8 @@ opts.each do |opt, arg|
     when '--twitter'
         require_relative './twitterConfig.rb'
         twitter=true
+    when '--debug'
+        debug=true
     else
         puts "[-c|--city {$city}] [-t|--twitter]"
         puts "[-t|--twitter] Push output to twitter"
@@ -119,9 +123,18 @@ else
 
 	if client
 	   puts "Client ready"
-       r = client.update(announceStr) or puts "Update fail?"
-       puts "Announced!"
-       puts r.url
+       unless debug
+        r = client.update(announceStr)
+
+        if ! r.nil?
+            puts "Announced!"
+            puts r.url
+        else
+            puts "Annouced failed"
+        end
+       else
+        puts "Debug on, not announcing"
+       end
        puts announceStr
 	else
 	    $stderr.puts "Client error"

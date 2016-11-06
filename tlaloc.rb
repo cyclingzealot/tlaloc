@@ -95,7 +95,7 @@ forecasts.each { |f|
 
 i=0
 if twitter
-    announceStr = "Your #ottbike #ottweather " + announceStr
+    announceStr = "Your #ottbike #ottweather until #{untilHour}:59: " + announceStr
 
 	if (announceStr + popStr).length > 140
 	    announceStr="Current/Worst: Wc: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}\n"

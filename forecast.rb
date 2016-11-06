@@ -1,5 +1,6 @@
 require 'byebug'
 require 'twitter'
+require 'active_support/time'
 
 
 class Forecast
@@ -9,8 +10,10 @@ class Forecast
     @pcpType = nil
     @pop     = nil
     @dateTime = nil
+    @zone = nil
 
     def initialize(line)
+        @zone = ActiveSupport::TimeZone.new("Eastern Time (US & Canada)")
     # From the 7th line (current), record the temperature (14th column T) and precipiration (5th column)
     # See http://dd.weather.gc.ca/nowcasting/doc/README_nowcasting_prevision-immediate.txt
         parts = line.split('|')
@@ -20,8 +23,7 @@ class Forecast
 
         hourNum = parts[0].strip.split(' ')[1].strip[0,2].to_i
         n = DateTime.now
-        @dateTime = DateTime.new(n.year, n.month, n.day, hourNum, n.minute, n.second)
-        @dateTime -= 4/24
+        @dateTime = DateTime.new(n.year, n.month, n.day, hourNum, 0, 0, "+0")
 
         @pcpType = 'none' if @pcpType.nil? or @pcpType.empty?
 
@@ -65,11 +67,11 @@ class Forecast
     end
 
     def dateTime()
-        return @dateTime
+        return @dateTime.in_time_zone(@zone)
     end
 
     def hour()
-        return @dateTime.hour
+        return @dateTime.in_time_zone(@zone).hour
     end
 
 

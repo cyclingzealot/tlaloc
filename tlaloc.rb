@@ -76,7 +76,7 @@ untilHour=forecasts.max_by {|f| f.dateTime}.hour
 sunsetStr=`curl -s http://www.cmpsolv.com/cgi-bin/sunset?loc=#{city} | grep 'Sunset:'`.strip
 sunset = sunsetStr.split(' ').last.strip
 
-announceStr="Current/Worst: Windchil: #{current.windChill}/#{minWindChill}, POP: #{current.pcpType}/#{maxPop}; Sunset: #{sunset}\n"
+announceStr="Current/Worst: Windchill: #{current.windChill}/#{minWindChill}, POP: #{current.pcpType}/#{maxPop}; Sunset: #{sunset}\n"
 
 popStr=''
 i=0

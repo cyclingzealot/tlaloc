@@ -49,6 +49,10 @@ class Forecast
         end
     end
 
+    def windChill?()
+        return ! self.windChill() == @temp
+    end
+
     def pop()
         return @pop
     end

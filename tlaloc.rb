@@ -105,12 +105,16 @@ if twitter
 	    announceStr = "#ottbike #ottweather until #{untilHour}:59: " + announceStr
         popStr=''
 	    forecasts.each { |f|
+            strLength = (announceStr + popStr).length
 		    if f.pop >= 30
 		        i += 1
 		        if i==1
 		            popStr += "POP > 30% @ #{f.hour}:00"
-		        else
+		        elsif strLength < 140 - 5
 		            popStr += ", #{f.hour}"
+                else
+                    popStr += '+'
+                    break
 		        end
 	        end
 	    }

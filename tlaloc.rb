@@ -86,9 +86,9 @@ forecasts.each { |f|
     if f.pop >= 30
         i += 1
         if i==1
-            popStr = "#{f.hour}:00: #{f.pop}%; "
+            popStr += "#{f.hour}:00: #{f.pop}%; "
         else
-            popStr = "#{f.hour}: #{f.pop}; "
+            popStr += "#{f.hour}: #{f.pop}; "
         end
     end
 }
@@ -97,16 +97,20 @@ i=0
 if twitter
     announceStr = "Your #ottbike #ottweather until #{untilHour}:59: " + announceStr
 
-	if (announceStr + popStr).length > 140
+    strLength = (announceStr + popStr).length
+
+	if strLength > 140
+        puts "Announce str too long (#{strLength}: #{announceStr + popStr}), shortning" if debug
 	    announceStr="Current/Worst: Wc: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}\n"
 	    announceStr = "#ottbike #ottweather until #{untilHour}:59: " + announceStr
+        popStr=''
 	    forecasts.each { |f|
 		    if f.pop >= 30
 		        i += 1
 		        if i==1
-		            popStr = "POP > 30%: #{f.hour}:00"
+		            popStr += "POP > 30% @ #{f.hour}:00"
 		        else
-		            popStr = "; #{f.hour}"
+		            popStr += ", #{f.hour}"
 		        end
 	        end
 	    }

@@ -35,6 +35,7 @@ opts.each do |opt, arg|
     else
         puts "[-c|--city {$city}] [-t|--twitter]"
         puts "[-t|--twitter] Push output to twitter"
+        puts "[-d|--debug] Debug mode.  Don't push to twitter, print data output."
         puts "[-h|--help] Show this help screen"
         exit 1
   end
@@ -126,22 +127,24 @@ else
 	if client
 	   puts "Client ready"
        unless debug
-        r = client.update(announceStr)
+         r = client.update(announceStr)
 
-        if ! r.nil?
+         if ! r.nil?
             puts "Announced!"
             puts r.url
-        else
+         else
             puts "Annouced failed"
-        end
-       else
-        puts "Debug on, not announcing"
-       end
-       puts announceStr
+         end
+      else
+         puts "Debug on, not announcing"
+      end
+      puts announceStr
 	else
 	    $stderr.puts "Client error"
 	    exit 1
 	end
+
+    puts "String length is #{announceStr.length}"
 end
 
 

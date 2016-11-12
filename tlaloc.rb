@@ -69,7 +69,10 @@ maxPop=forecasts.max_by {|f|
 
 minWindChill=forecasts.min_by {|f| f.windChill}.windChill
 
-minTemp=forecasts.min_by {|f| f.temp}.temp
+minTempFc=forecasts.min_by {|f| f.temp}
+minTemp = minTempFc.temp
+
+isThereWindChill = current.windChill? || minTempFc.windChill?
 
 untilHour=forecasts.max_by {|f| f.dateTime}.hour
 
@@ -79,7 +82,9 @@ untilHour=forecasts.max_by {|f| f.dateTime}.hour
 sunsetStr=`curl -s http://www.cmpsolv.com/cgi-bin/sunset?loc=#{city} | grep 'Sunset:'`.strip
 sunset = sunsetStr.split(' ').last.strip
 
-announceStr="Current/Worst: Windchill: #{current.windChill}/#{minWindChill}, POP: #{current.pcpType}/#{maxPop}; Sunset: #{sunset}\n"
+windChillLabel = minTemp < 10 ? 'Windchill' : 'Temperature'
+
+bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{minWindChill}, POP: #{current.pcpType}/#{maxPop}; Sunset: #{sunset}\n"
 
 popStr=''
 i=0
@@ -94,48 +99,69 @@ forecasts.each { |f|
     end
 }
 
+windStr = ''
+windTimes = ''
+
 i=0
 if twitter
-    announceStr = "Your #ottbike #ottweather until #{untilHour+1}:00: " + announceStr
+    twitterMaxChars = 140
+    finalStr = '#' * (twitterMaxChars + 10)
+    attempt=0
 
-    strLength = (announceStr + popStr).length
+    while(finalStr.length >= 140)
+        attempt+=1
 
-	if strLength > 140
-        puts "Announce str too long (#{strLength}: #{announceStr + popStr}), shortning" if debug
-	    announceStr="Current/Worst: Wc: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}\n"
-	    announceStr = "#ottbike #ottweather until #{untilHour+1}:00: " + announceStr
-        popStr=''
-	    forecasts.each { |f|
-            strLength = (announceStr + popStr).length
-		    if f.pop >= 30
-		        i += 1
-		        if i==1
-		            popStr += "POP > 30% @ #{f.hour}:00"
-		        elsif strLength < 140 - 5
-		            popStr += ", #{f.hour}"
-                else
-                    popStr += '+'
-                    break
+        case attempt
+        when 1
+            announceStr = "Your #ottbike #ottweather until #{untilHour+1}:00: "
+        when 2
+            windTimes = ''
+        when 3
+            windStr = ''
+        when 4
+	        announceStr = "#ottbike #ottweather until #{untilHour+1}:00: "
+        when 5
+            windChillLabel = minTemp < 10 ? 'Wc' : 'T'
+	        bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}\n"
+        when 10
+	        popStr=''
+		    forecasts.each { |f|
+	            strLength = finalStr.length
+			    if f.pop >= 30
+			        i += 1
+			        if i==1
+			            popStr += "POP > 30% @ #{f.hour}:00"
+			        elsif strLength < 140 - 5
+			            popStr += ", #{f.hour}"
+	                else
+	                    popStr += '+'
+	                    break
+			        end
 		        end
-	        end
-	    }
+	        }
+        else
+            finalStr = finalStr[0,twitterMaxChars-1]
+        end
+
+
+        finalStr = announceStr + bodyStr + windStr + popStr + windTimes
+
+    end
+
 	end
 
-end
 
-
-announceStr += popStr
-announceStr.strip!
+finalStr.strip!
 
 unless twitter
-    puts announceStr
+    puts finalStr
 else
 	client = Twitter::REST::Client.new($clientConf)
 
 	if client
 	   puts "Client ready"
        unless debug
-         r = client.update(announceStr)
+         r = client.update(finalStr)
 
          if ! r.nil?
             puts "Announced!"
@@ -146,13 +172,13 @@ else
       else
          puts "Debug on, not announcing"
       end
-      puts announceStr
+      puts finalStr
 	else
 	    $stderr.puts "Client error"
 	    exit 1
 	end
 
-    puts "String length is #{announceStr.length}"
+    puts "String length is #{finalStr.length}"
 end
 
 

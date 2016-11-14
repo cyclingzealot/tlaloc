@@ -101,11 +101,12 @@ forecasts.each { |f|
 
 windStr = ''
 windTimes = ''
+finalStr = bodyStr
 
 i=0
 if twitter
-    twitterMaxChars = 140
     finalStr = '#' * (twitterMaxChars + 10)
+    twitterMaxChars = 140
     attempt=0
 
     while(finalStr.length >= 140)

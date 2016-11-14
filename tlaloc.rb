@@ -2,7 +2,6 @@
 
 require 'nokogiri'
 require 'open-uri'
-require 'cachy'
 require 'byebug'
 require 'getoptlong'
 
@@ -43,15 +42,33 @@ end
 
 
 
-f = File.open("/tmp/tlalocCache.#{city}.txt", 'w')
-Cachy.cache_store = f
-
-data=Cachy.cache(city, :expires_in => 10/60/24) {
-	# Get the last file of http://dd.weather.gc.ca/nowcasting/matrices/
+### If the data file is more than 5 minutes old, get a new one
+minuteOfCache = 27
+dataLocation = '/tmp/tlaloc.ecData.txt'
+n = DateTime.now
+if ! File.exists?(dataLocation) or (File.stat(dataLocation).mtime < DateTime.new(n.year, n.month, n.day, n.hour, minuteOfCache))
+    puts "Refreshing cache because cache is before #{minuteOfCache} minute of the hour" if (debug or twitter)
     urlBase='http://dd.weather.gc.ca/nowcasting/matrices/'
     fileURL=`lynx --dump #{urlBase} | tail -n 1 | cut -d ' ' -f 4`.chomp
-    `curl -s #{fileURL} | gzip -dc | grep #{city} -A 28`
-}
+    `curl -s #{fileURL} | gzip -dc > #{dataLocation}`
+end
+
+## Get sunset at
+## http://www.cmpsolv.com/cgi-bin/sunset?loc=YOW
+
+# First store the file if it's a new day
+sunsetLocation = "/tmp/tlaloc.sunset.#{city}.html"
+if ! File.exists?(sunsetLocation) or File.stat(sunsetLocation).mtime < DateTime.now.beginning_of_day()
+    puts "Refreshing sunset times" if (debug or twitter)
+    `curl -s http://www.cmpsolv.com/cgi-bin/sunset?loc=#{city} > #{sunsetLocation}`
+end
+
+# Get the sunset time from the cached file
+sunsetStr=`cat #{sunsetLocation} | grep 'Sunset:'`.strip
+sunset = sunsetStr.split(' ').last.strip
+
+#### Now get the data for your city
+data = `cat #{dataLocation} | grep #{city} -A 28`
 
 # Keep 7th line of data (12th line of output) until the time is 2 AM Zulu
 currentLine=data.split("\n")[11]
@@ -79,11 +96,6 @@ isThereWindChill = current.windChill? || minTempFc.windChill?
 untilHour=forecasts.max_by {|f| f.dateTime}.hour
 
 
-## Get sunset at
-## http://www.cmpsolv.com/cgi-bin/sunset?loc=YOW
-sunsetStr=`curl -s http://www.cmpsolv.com/cgi-bin/sunset?loc=#{city} | grep 'Sunset:'`.strip
-sunset = sunsetStr.split(' ').last.strip
-
 windChillLabel = minTemp < 10 ? 'Windchill' : 'Temperature'
 
 bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{minWindChill}, POP: #{current.pcpType}/#{maxPop}; Sunset: #{sunset}\n"
@@ -107,8 +119,8 @@ finalStr = bodyStr
 
 i=0
 if twitter
-    finalStr = '#' * (twitterMaxChars + 10)
     twitterMaxChars = 140
+    finalStr = '#' * (twitterMaxChars + 10)
     attempt=0
 
     while(finalStr.length >= 140)

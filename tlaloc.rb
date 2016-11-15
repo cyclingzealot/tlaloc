@@ -51,10 +51,10 @@ minuteOfCache = 27
 dataLocation = '/tmp/tlaloc.ecData.txt'
 n = DateTime.now
 lastRefreshWasAt = File.stat(dataLocation).mtime
-debugger if debug
-lastRefreshShouldBeAt = DateTime.new(n.year, n.month, n.day, n.hour, minuteOfCache, lastRefreshWasAt.timezone)
+lastRefreshShouldBeAt = DateTime.new(n.year, n.month, n.day, n.hour, minuteOfCache, 0, (lastRefreshWasAt.utc_offset/60/60).to_s)
 lastRefreshShouldBeAt -= 1.0/24 if lastRefreshShouldBeAt > n
 lastRefreshShouldBeAt -= 1.0/60/24
+debugger if debug
 
 # Fetch data if necessary
 if ! File.exists?(dataLocation) or (lastRefreshWasAt < lastRefreshShouldBeAt)
@@ -63,7 +63,7 @@ if ! File.exists?(dataLocation) or (lastRefreshWasAt < lastRefreshShouldBeAt)
     fileURL=`lynx --dump #{urlBase} | tail -n 1 | cut -d ' ' -f 4`.chomp
     `curl -s #{fileURL} | gzip -dc > #{dataLocation}`
 else
-    puts "Not refreshing cache because cache dated #{lastRefreshWasAt.rfc2822} is before #{lastRefreshShouldBeAt.rfc2822}" if (debug or twitter)
+    puts "Not refreshing cache because cache dated #{lastRefreshWasAt.rfc2822} is after #{lastRefreshShouldBeAt.rfc2822}" if (debug or twitter)
 end
 
 #### Now get the data for your city

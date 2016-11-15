@@ -156,8 +156,6 @@ forecasts.each { |f|
     end
 }
 
-debugger if debug
-
 windStr = ''
 windTimes = ''
 finalStr = bodyStr
@@ -175,12 +173,17 @@ if twitter
         when 1
             announceStr = "Your #ottbike #ottweather until #{untilHour+1}:00: "
         when 2
-            windTimes = ''
-        when 3
-            windStr = ''
-        when 4
 	        announceStr = "#ottbike #ottweather until #{untilHour+1}:00: "
+        when 3
+	        announceStr = "#ottbike #ottweather until #{untilHour+1}hr: "
+        when 4
+            popStr.strip!
+            popStr.gsub!(/;$/, '')
         when 5
+            windTimes = ''
+        when 6
+            windStr = ''
+        when 7
             windChillLabel = minTemp < 10 ? 'Wc' : 'T'
 	        bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}\n"
         when 10

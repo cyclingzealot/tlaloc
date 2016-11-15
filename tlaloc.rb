@@ -45,13 +45,16 @@ end
 ### Get data #########################################################
 
 
-### If data before the 27 minute of the hour, get new cache
+### Determine date time of last refresh
 minuteOfCache = 27
 dataLocation = '/tmp/tlaloc.ecData.txt'
 n = DateTime.now
-refreshDateTime = DateTime.new(n.year, n.month, n.day, n.hour, minuteOfCache)
-if ! File.exists?(dataLocation) or (File.stat(dataLocation).mtime < refreshDateTime and DateTime.now > refreshDateTime)
-    puts "Refreshing cache because cache is before #{minuteOfCache} minute of the hour" if (debug or twitter)
+lastRefreshShouldBeAt = DateTime.new(n.year, n.month, n.day, n.hour, minuteOfCache)
+lastRefreshShouldBeAt -= 1.0/24 if lastRefreshShouldBeAt > n
+
+# Fetch data if necessary
+if ! File.exists?(dataLocation) or (File.stat(dataLocation).mtime < lastRefreshShouldBeAt)
+    puts "Refreshing cache because cache is before #{lastRefreshShouldBeAt.rfc2822}" if (debug or twitter)
     urlBase='http://dd.weather.gc.ca/nowcasting/matrices/'
     fileURL=`lynx --dump #{urlBase} | tail -n 1 | cut -d ' ' -f 4`.chomp
     `curl -s #{fileURL} | gzip -dc > #{dataLocation}`

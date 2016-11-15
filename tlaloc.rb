@@ -14,7 +14,7 @@ opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--city', '-c', GetoptLong::REQUIRED_ARGUMENT ],
   [ '--twitter', '-t', GetoptLong::NO_ARGUMENT ],
-  [ '--debug', '-d', GetoptLong::NO_ARGUMENT ]
+  [ '--debug', '-d', GetoptLong::NO_ARGUMENT ],
 )
 
 
@@ -32,7 +32,7 @@ opts.each do |opt, arg|
     when '--debug'
         debug=true
     else
-        puts "[-c|--city {$city}] [-t|--twitter]"
+        puts "[-c|--city {$city}] EC code of the city in question.  See later half of http://dd.weather.gc.ca/nowcasting/doc/README_nowcasting_prevision-immediate.txt"
         puts "[-t|--twitter] Push output to twitter"
         puts "[-d|--debug] Debug mode.  Don't push to twitter, print data output."
         puts "[-h|--help] Show this help screen"
@@ -42,11 +42,15 @@ end
 
 
 
-### If the data file is more than 5 minutes old, get a new one
+### Get data #########################################################
+
+
+### If data before the 27 minute of the hour, get new cache
 minuteOfCache = 27
 dataLocation = '/tmp/tlaloc.ecData.txt'
 n = DateTime.now
-if ! File.exists?(dataLocation) or (File.stat(dataLocation).mtime < DateTime.new(n.year, n.month, n.day, n.hour, minuteOfCache))
+refreshDateTime = DateTime.new(n.year, n.month, n.day, n.hour, minuteOfCache)
+if ! File.exists?(dataLocation) or (File.stat(dataLocation).mtime < refreshDateTime and DateTime.now > refreshDateTime)
     puts "Refreshing cache because cache is before #{minuteOfCache} minute of the hour" if (debug or twitter)
     urlBase='http://dd.weather.gc.ca/nowcasting/matrices/'
     fileURL=`lynx --dump #{urlBase} | tail -n 1 | cut -d ' ' -f 4`.chomp
@@ -60,23 +64,35 @@ if data.nil?
     exit 1
 end
 
+
+### Get sunset times #################################################
+
+
 ## Get sunset at
 ## http://www.cmpsolv.com/cgi-bin/sunset?loc=YOW
 
+## Eventually this should be replaced by scanning http://dd.weather.gc.ca/nowcasting/doc/README_nowcasting_prevision-immediate.txt
+## and use https://github.com/joeyates/ruby-sun-times to calculate
+
 # First store the file if it's a new day
-sunsetLocation = "/tmp/tlaloc.sunset.#{city}.html"
-if ! File.exists?(sunsetLocation) or File.stat(sunsetLocation).mtime < DateTime.now.beginning_of_day()
-    puts "Refreshing sunset times" if (debug or twitter)
-    `curl -s http://www.cmpsolv.com/cgi-bin/sunset?loc=#{city} > #{sunsetLocation}`
+sunsetLocationCache = "/tmp/tlaloc.sunset.#{city}.html"
+if ! File.exists?(sunsetLocationCache) or File.stat(sunsetLocationCache).mtime < DateTime.now.beginning_of_day()
+    puts "Refreshing sunset times for #{city}" if (debug or twitter)
+    `curl -s http://www.cmpsolv.com/cgi-bin/sunset?loc=#{city} > #{sunsetLocationCache}`
 end
 
 # Get the sunset time from the cached file
-sunsetStr=`cat #{sunsetLocation} | grep 'Sunset:'`.strip
+sunsetStr=`cat #{sunsetLocationCache} | grep 'Sunset:'`.strip
 if sunsetStr.split(' ').last.nil?
     puts $stderr.puts "No sunset data for #{city}"
     exit 1
 end
 sunset = sunsetStr.split(' ').last.strip
+
+
+
+
+### Process data into forecasts objects ##############################
 
 # Keep 7th line of data (12th line of output) until the time is 2 AM Zulu
 currentLine=data.split("\n")[11]
@@ -89,6 +105,10 @@ forecasts = forecastStrings[11..forecastStrings.size-1].map { |l|
     next if l[0] == '-'
     Forecast.new(l)
 }.compact
+
+
+
+### Calculate worst cases ############################################
 
 maxPop=forecasts.max_by {|f|
     f.pop
@@ -103,6 +123,9 @@ isThereWindChill = current.windChill? || minTempFc.windChill?
 
 untilHour=forecasts.max_by {|f| f.dateTime}.hour
 
+
+
+### Decide on string #################################################
 
 windChillLabel = minTemp < 10 ? 'Windchill' : 'Temperature'
 
@@ -175,6 +198,9 @@ if twitter
 
 
 finalStr.strip!
+
+
+### Ouput / publish ##################################################
 
 unless twitter
     puts finalStr

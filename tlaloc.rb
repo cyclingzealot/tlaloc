@@ -54,7 +54,6 @@ lastRefreshWasAt = File.stat(dataLocation).mtime
 lastRefreshShouldBeAt = DateTime.new(n.year, n.month, n.day, n.hour, minuteOfCache, 0, (lastRefreshWasAt.utc_offset/60/60).to_s)
 lastRefreshShouldBeAt -= 1.0/24 if lastRefreshShouldBeAt > n
 lastRefreshShouldBeAt -= 1.0/60/24
-debugger if debug
 
 # Fetch data if necessary
 if ! File.exists?(dataLocation) or (lastRefreshWasAt < lastRefreshShouldBeAt)
@@ -157,6 +156,8 @@ forecasts.each { |f|
     end
 }
 
+debugger if debug
+
 windStr = ''
 windTimes = ''
 finalStr = bodyStr
@@ -207,7 +208,10 @@ if twitter
 
     end
 
-	end
+else
+    finalStr = bodyStr + windStr + popStr + windTimes
+end
+
 
 
 finalStr.strip!

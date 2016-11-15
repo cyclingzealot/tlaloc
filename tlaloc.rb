@@ -41,6 +41,7 @@ opts.each do |opt, arg|
 end
 
 
+puts DateTime.now.rfc2822 if twitter
 
 ### Get data #########################################################
 

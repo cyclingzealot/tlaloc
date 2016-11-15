@@ -67,6 +67,8 @@ if data.nil?
     exit 1
 end
 
+puts data if debug
+
 
 ### Get sunset times #################################################
 

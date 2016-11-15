@@ -53,6 +53,13 @@ if ! File.exists?(dataLocation) or (File.stat(dataLocation).mtime < DateTime.new
     `curl -s #{fileURL} | gzip -dc > #{dataLocation}`
 end
 
+#### Now get the data for your city
+data = `cat #{dataLocation} | grep #{city} -A 28`
+if data.nil?
+    puts $stderr.puts "No EC data for #{city}"
+    exit 1
+end
+
 ## Get sunset at
 ## http://www.cmpsolv.com/cgi-bin/sunset?loc=YOW
 
@@ -65,10 +72,11 @@ end
 
 # Get the sunset time from the cached file
 sunsetStr=`cat #{sunsetLocation} | grep 'Sunset:'`.strip
+if sunsetStr.split(' ').last.nil?
+    puts $stderr.puts "No sunset data for #{city}"
+    exit 1
+end
 sunset = sunsetStr.split(' ').last.strip
-
-#### Now get the data for your city
-data = `cat #{dataLocation} | grep #{city} -A 28`
 
 # Keep 7th line of data (12th line of output) until the time is 2 AM Zulu
 currentLine=data.split("\n")[11]

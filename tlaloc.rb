@@ -53,11 +53,13 @@ lastRefreshShouldBeAt = DateTime.new(n.year, n.month, n.day, n.hour, minuteOfCac
 lastRefreshShouldBeAt -= 1.0/24 if lastRefreshShouldBeAt > n
 
 # Fetch data if necessary
-if ! File.exists?(dataLocation) or (File.stat(dataLocation).mtime < lastRefreshShouldBeAt)
+if ! File.exists?(dataLocation) or (File.stat(dataLocation).mtime < lastRefreshShouldBeAt - 1.0/60/24)
     puts "Refreshing cache because cache is before #{lastRefreshShouldBeAt.rfc2822}" if (debug or twitter)
     urlBase='http://dd.weather.gc.ca/nowcasting/matrices/'
     fileURL=`lynx --dump #{urlBase} | tail -n 1 | cut -d ' ' -f 4`.chomp
     `curl -s #{fileURL} | gzip -dc > #{dataLocation}`
+else
+    puts "Not refreshing cache because cache is after #{lastRefreshShouldBeAt.rfc2822}" if (debug or twitter)
 end
 
 #### Now get the data for your city
@@ -67,7 +69,7 @@ if data.nil?
     exit 1
 end
 
-puts data if debug
+puts data if (debug or twitter)
 
 
 ### Get sunset times #################################################
@@ -84,6 +86,8 @@ sunsetLocationCache = "/tmp/tlaloc.sunset.#{city}.html"
 if ! File.exists?(sunsetLocationCache) or File.stat(sunsetLocationCache).mtime < DateTime.now.beginning_of_day()
     puts "Refreshing sunset times for #{city}" if (debug or twitter)
     `curl -s http://www.cmpsolv.com/cgi-bin/sunset?loc=#{city} > #{sunsetLocationCache}`
+else
+    puts "Not refereshing sunset times for #{city}" if (debug or twitter)
 end
 
 # Get the sunset time from the cached file

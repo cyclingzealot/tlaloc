@@ -188,6 +188,21 @@ if twitter
         when 10
 	        popStr=''
 		    forecasts.each { |f|
+			    if f.pop >= 30
+			        i += 1
+			        if i==1
+			            popStr += "POP > 30% @ #{f.hour}:00"
+                    else
+			            popStr += ", #{f.hour}"
+			        end
+		        end
+	        }
+        when 20
+            windChillLabel = minTemp < 10 ? 'Wc' : 'T'
+	        bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}\n"
+        when 50
+	        popStr=''
+		    forecasts.each { |f|
                 finalStr = announceStr + bodyStr + windStr + popStr + windTimes
 	            strLength = finalStr.length
 			    if f.pop >= 30
@@ -201,10 +216,7 @@ if twitter
 	                    break
 			        end
 		        end
-	        }
-        when 20
-            windChillLabel = minTemp < 10 ? 'Wc' : 'T'
-	        bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}\n"
+            }
         when 100
             finalStr = finalStr[0,twitterMaxChars-1]
         end

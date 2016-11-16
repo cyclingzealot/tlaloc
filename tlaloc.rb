@@ -199,6 +199,8 @@ if twitter
 	        }
         when 20
             windChillLabel = minTemp < 10 ? 'Wc' : 'T'
+	        bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{minWindChill}, POP: #{current.pcpType}/#{maxPop}; Sunset: #{sunset}\n"
+        when 21
 	        bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}\n"
         when 50
 	        popStr=''
@@ -208,7 +210,7 @@ if twitter
 			    if f.pop >= 30
 			        i += 1
 			        if i==1
-			            popStr += "POP > 30% @ #{f.hour}:00"
+			            popStr += "POP>30% @ #{f.dateTime.strftime('%l%P').strip}"
 			        elsif strLength < twitterMaxChars - 5
 			            popStr += ", #{f.hour}"
 	                else

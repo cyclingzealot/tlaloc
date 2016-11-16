@@ -133,7 +133,8 @@ minTemp = minTempFc.temp
 
 isThereWindChill = current.windChill? || minTempFc.windChill?
 
-untilHour=forecasts.max_by {|f| f.dateTime}.hour
+untilDateTime=(forecasts.max_by {|f| f.dateTime}.dateTime) + 1*60*60
+untilHour=untilDateTime.hour
 
 
 
@@ -149,7 +150,7 @@ forecasts.each { |f|
     if f.pop >= 30
         i += 1
         if i==1
-            popStr += "#{f.hour}:00: #{f.pop}%; "
+            popStr += "POP: #{f.hour}:00: #{f.pop}%; "
         else
             popStr += "#{f.hour}: #{f.pop}; "
         end
@@ -167,15 +168,16 @@ if twitter
     attempt=0
 
     while(finalStr.length >= 140)
+        puts "#{finalStr.length} chars: #{finalStr}" if debug
         attempt+=1
 
         case attempt
         when 1
-            announceStr = "Your #ottbike #ottweather until #{untilHour+1}:00: "
+            announceStr = "Your #ottbike #ottweather until #{untilDateTime.strftime('%k:%M').strip}: "
         when 2
-	        announceStr = "#ottbike #ottweather until #{untilHour+1}:00: "
+            announceStr = "#ottbike #ottweather until #{untilDateTime.strftime('%k:%M').strip}: "
         when 3
-	        announceStr = "#ottbike #ottweather until #{untilHour+1}hr: "
+            announceStr = "#ottbike #ottweather until #{untilDateTime.strftime('%l%P').strip}: "
         when 4
             popStr.strip!
             popStr.gsub!(/;$/, '')
@@ -183,18 +185,16 @@ if twitter
             windTimes = ''
         when 6
             windStr = ''
-        when 7
-            windChillLabel = minTemp < 10 ? 'Wc' : 'T'
-	        bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}\n"
         when 10
 	        popStr=''
 		    forecasts.each { |f|
+                finalStr = announceStr + bodyStr + windStr + popStr + windTimes
 	            strLength = finalStr.length
 			    if f.pop >= 30
 			        i += 1
 			        if i==1
 			            popStr += "POP > 30% @ #{f.hour}:00"
-			        elsif strLength < 140 - 5
+			        elsif strLength < twitterMaxChars - 5
 			            popStr += ", #{f.hour}"
 	                else
 	                    popStr += '+'
@@ -202,7 +202,10 @@ if twitter
 			        end
 		        end
 	        }
-        else
+        when 20
+            windChillLabel = minTemp < 10 ? 'Wc' : 'T'
+	        bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}\n"
+        when 100
             finalStr = finalStr[0,twitterMaxChars-1]
         end
 

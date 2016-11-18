@@ -51,25 +51,28 @@ minuteOfCache = 27
 dataLocation = '/tmp/tlaloc.ecData.txt'
 n = DateTime.now
 refreshECdata = false
+reason = ''
 if File.exists?(dataLocation)
     lastRefreshWasAt = File.stat(dataLocation).mtime
     lastRefreshShouldBeAt = DateTime.new(n.year, n.month, n.day, n.hour, minuteOfCache, 0, (lastRefreshWasAt.utc_offset/60/60).to_s)
     lastRefreshShouldBeAt -= 1.0/24 if lastRefreshShouldBeAt > n
     lastRefreshShouldBeAt -= 1.0/60/24
     refreshECdata = lastRefreshWasAt < lastRefreshShouldBeAt
+    reason = "cache dated #{lastRefreshWasAt.rfc2822} is #{refreshECdata ? 'before' : 'after'} #{lastRefreshShouldBeAt.rfc2822}"
 else
     refreshECdata = true
+    reason = "file does not exist"
 end
 
 
 # Fetch data if necessary
 if refreshECdata
-    puts "Refreshing cache because cache dated #{lastRefreshWasAt.rfc2822} is before #{lastRefreshShouldBeAt.rfc2822}" if (debug or twitter)
+    puts "Refreshing cache because #{reason}" if (debug or twitter)
     urlBase='http://dd.weather.gc.ca/nowcasting/matrices/'
     fileURL=`lynx --dump #{urlBase} | tail -n 1 | cut -d ' ' -f 4`.chomp
     `curl -s #{fileURL} | gzip -dc > #{dataLocation}`
 else
-    puts "Not refreshing cache because cache dated #{lastRefreshWasAt.rfc2822} is after #{lastRefreshShouldBeAt.rfc2822}" if (debug or twitter)
+    puts "Not refreshing cache because #{reason}" if (debug or twitter)
 end
 
 #### Now get the data for your city

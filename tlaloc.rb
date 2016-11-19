@@ -177,6 +177,11 @@ finalStr = bodyStr
 ### Decide on string if twitter ######################################
 i=0
 if twitter
+    if $clientConf[city].nil?
+        $stderr.puts "No configuration for city #{city}, can't announce"
+        exit 1
+    end
+
     weatherHashTag  = $clientConf[city]['weatherHashTag']
     bikeHashTag     = $clientConf[city]['bikeHashTag']
 

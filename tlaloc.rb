@@ -189,11 +189,11 @@ if twitter
 
         case attempt
         when 1
-            announceStr = "Your #ottbike #ottweather until #{untilDateTime.strftime('%k:%M').strip}: "
+            announceStr = "Your #{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%k:%M').strip}: "
         when 2
-            announceStr = "#ottbike #ottweather until #{untilDateTime.strftime('%k:%M').strip}: "
+            announceStr = "#{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%k:%M').strip}: "
         when 3
-            announceStr = "#ottbike #ottweather until #{untilDateTime.strftime('%l%P').strip}: "
+            announceStr = "#{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%l%P').strip}: "
         when 4
             popStr.strip!
             popStr.gsub!(/;$/, '')

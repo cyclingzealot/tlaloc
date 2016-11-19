@@ -148,17 +148,14 @@ untilHour=untilDateTime.hour
 
 
 
-### Get hashtags #####################################################
-
-weatherHashTag  = $clientConf[city]['weatherHashTag']
-bikeHashTag     = $clientConf[city]['bikeHashTag']
-
 ### Decide on string #################################################
 
 windChillLabel = minTemp < 10 ? 'Windchill' : 'Temperature'
 
 bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{minWindChill}, POP: #{current.pcpType}/#{maxPop}; Sunset: #{sunset}\n"
 
+
+# POP string
 popStr=''
 i=0
 forecasts.each { |f|
@@ -177,8 +174,12 @@ windTimes = ''
 finalStr = bodyStr
 
 
+### Decide on string if twitter ######################################
 i=0
 if twitter
+    weatherHashTag  = $clientConf[city]['weatherHashTag']
+    bikeHashTag     = $clientConf[city]['bikeHashTag']
+
     twitterMaxChars = 140
     finalStr = '#' * (twitterMaxChars + 10)
     attempt=0

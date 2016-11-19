@@ -148,6 +148,11 @@ untilHour=untilDateTime.hour
 
 
 
+### Get hashtags #####################################################
+
+weatherHashTag  = $clientConf[city]['weatherHashTag']
+bikeHashTag     = $clientConf[city]['bikeHashTag']
+
 ### Decide on string #################################################
 
 windChillLabel = minTemp < 10 ? 'Windchill' : 'Temperature'
@@ -170,6 +175,7 @@ forecasts.each { |f|
 windStr = ''
 windTimes = ''
 finalStr = bodyStr
+
 
 i=0
 if twitter
@@ -238,7 +244,7 @@ finalStr.strip!
 unless twitter
     puts finalStr
 else
-	client = Twitter::REST::Client.new($clientConf)
+	client = Twitter::REST::Client.new($clientConf[city])
 
 	if client
 	   puts "Client ready"

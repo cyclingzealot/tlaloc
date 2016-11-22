@@ -8,6 +8,25 @@ require 'getoptlong'
 
 require_relative './forecast.rb'
 
+def searchCity(city)
+    storePath='/tmp/README_nowcasting_prevision-immediate.txt'
+    `lynx --dump http://dd.weather.gc.ca/nowcasting/doc/README_nowcasting_prevision-immediate.txt > #{storePath}`
+    startAt = `grep -n 'Code des stations' #{storePath} | tail -n 1 | cut -d':' -f 1`.strip.to_i
+    lineCount = `wc -l #{storePath} | cut -f 1`.strip.to_i
+    tailArg = lineCount - startAt + 1
+    if city.empty?
+        matches = `tail -n #{tailArg} #{storePath}`.split("\n")
+    else
+        matches = `tail -n #{tailArg} #{storePath} | grep -i #{city}`.split("\n")
+    end
+
+    puts "You may enter:" if matches.count > 0
+    matches.each { |m|
+        code, number, name, lat, long = m.gsub(/\s+/m, ' ').strip.split(" ")
+        puts "#{code} for #{name}"
+    }
+end
+
 ### BEGIN SCRIPT ###############################################################
 
 opts = GetoptLong.new(
@@ -32,7 +51,7 @@ opts.each do |opt, arg|
     when '--debug'
         debug=true
     else
-        puts "[-c|--city {$city}] EC code of the city in question.  See later half of http://dd.weather.gc.ca/nowcasting/doc/README_nowcasting_prevision-immediate.txt"
+        puts "[-c|--city {$city}] EC code of the city in question (or search city list).  See later half of http://dd.weather.gc.ca/nowcasting/doc/README_nowcasting_prevision-immediate.txt"
         puts "[-t|--twitter] Push output to twitter"
         puts "[-d|--debug] Debug mode.  Don't push to twitter, print data output."
         puts "[-h|--help] Show this help screen"
@@ -77,12 +96,19 @@ end
 
 #### Now get the data for your city
 data = `cat #{dataLocation} | grep #{city} -A 28`
-if data.nil?
+if data.nil? or data.empty?
     puts $stderr.puts "No EC data for #{city}"
+    searchCity(city)
+    exit 1
+elsif data.split("\n").count > 29
+    searchCity(city)
+    puts $stderr.puts "More than one city"
     exit 1
 end
 
+puts "Data on data:"
 puts data if (debug or twitter)
+puts data.split("\n").count if debug
 
 
 ### Get sunset times #################################################
@@ -269,3 +295,5 @@ else
 
     puts "String length is #{finalStr.length}"
 end
+
+

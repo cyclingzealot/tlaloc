@@ -8,9 +8,14 @@ require 'getoptlong'
 
 require_relative './forecast.rb'
 
-def searchCity(city)
+def searchCity(city, debug)
     storePath='/tmp/README_nowcasting_prevision-immediate.txt'
-    `lynx --dump http://dd.weather.gc.ca/nowcasting/doc/README_nowcasting_prevision-immediate.txt > #{storePath}`
+    if ! File.exists?(storePath)
+        puts "Downloading station list" if debug
+        `lynx --dump http://dd.weather.gc.ca/nowcasting/doc/README_nowcasting_prevision-immediate.txt > #{storePath}`
+    else
+        puts "Not downloading station list, already got it" if debug
+    end
     startAt = `grep -n 'Code des stations' #{storePath} | tail -n 1 | cut -d':' -f 1`.strip.to_i
     lineCount = `wc -l #{storePath} | cut -f 1`.strip.to_i
     tailArg = lineCount - startAt + 1
@@ -98,15 +103,15 @@ end
 data = `cat #{dataLocation} | grep #{city} -A 28`
 if data.nil? or data.empty?
     puts $stderr.puts "No EC data for #{city}"
-    searchCity(city)
+    searchCity(city, debug)
     exit 1
 elsif data.split("\n").count > 29
-    searchCity(city)
+    searchCity(city, debug)
     puts $stderr.puts "More than one city"
     exit 1
 end
 
-puts "Data on data:"
+puts "Data on data:" if debug
 puts data if (debug or twitter)
 puts data.split("\n").count if debug
 

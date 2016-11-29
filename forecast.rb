@@ -29,9 +29,9 @@ class Forecast
 
         ## Lets find the maximum POP of all 3 POP types
         @pop = [
-            parts[4].strip.to_i,
-            parts[6].strip.to_i,
-            parts[8].strip.to_i,
+            #parts[4].strip.to_i,
+            #parts[6].strip.to_i,
+            #parts[8].strip.to_i,
             parts[9].strip.to_i,
         ].max
 

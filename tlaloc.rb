@@ -32,6 +32,10 @@ def searchCity(city, debug)
     }
 end
 
+def fileOK(path, minLines)
+    return ((File.exists?(path)) and (`wc -l "#{path}"`.strip.split(' ')[0].to_i > minLines))
+end
+
 ### BEGIN SCRIPT ###############################################################
 
 opts = GetoptLong.new(
@@ -73,10 +77,11 @@ puts DateTime.now.rfc2822 if twitter
 ### Determine date time of last refresh
 minuteOfCache = 27
 dataLocation = '/tmp/tlaloc.ecData.txt'
+minLines = 21120 * 0.9
 n = DateTime.now
 refreshECdata = false
 reason = ''
-if File.exists?(dataLocation)
+if fileOK(dataLocation, minLines)
     lastRefreshWasAt = File.stat(dataLocation).mtime
     lastRefreshShouldBeAt = DateTime.new(n.year, n.month, n.day, n.hour, minuteOfCache, 0, (lastRefreshWasAt.utc_offset/60/60).to_s)
     lastRefreshShouldBeAt -= 1.0/24 if lastRefreshShouldBeAt > n
@@ -127,7 +132,8 @@ puts data.split("\n").count if debug
 
 # First store the file if it's a new day
 sunsetLocationCache = "/tmp/tlaloc.sunset.#{city}.html"
-if ! File.exists?(sunsetLocationCache) or File.stat(sunsetLocationCache).mtime < DateTime.now.beginning_of_day()
+minLines = 60*0.9
+if ! fileOK(sunsetLocationCache, minLines) or File.stat(sunsetLocationCache).mtime < DateTime.now.beginning_of_day()
     puts "Refreshing sunset times for #{city}" if (debug or twitter)
     `curl -s http://www.cmpsolv.com/cgi-bin/sunset?loc=#{city} > #{sunsetLocationCache}`
 else

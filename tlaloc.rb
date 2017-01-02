@@ -98,7 +98,7 @@ end
 if refreshECdata
     puts "Refreshing cache because #{reason}" if (debug or twitter)
     urlBase='http://dd.weather.gc.ca/nowcasting/matrices/?C=M;O=A'
-    fileURL=`lynx --dump #{urlBase} | tail -n 1 | cut -d ' ' -f 4`.chomp
+    fileURL=`lynx --dump '#{urlBase}' | tail -n 1 | cut -d ' ' -f 4`.chomp
     `curl -s #{fileURL} | gzip -dc > #{dataLocation}`
 else
     puts "Not refreshing cache because #{reason}" if (debug or twitter)

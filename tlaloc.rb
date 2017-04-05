@@ -6,32 +6,10 @@ require 'byebug'
 require 'getoptlong'
 
 
-require_relative './forecast.rb'
+require_relative './models/forecast.rb'
+require_relative './cache.rb'
+require_relative './models/location.rb'
 
-def searchCity(city, debug)
-    storePath='/tmp/README_nowcasting_prevision-immediate.txt'
-    url='http://dd.meteo.gc.ca/nowcasting/doc/README_INCS-SIPI.txt'
-    if ! File.exists?(storePath)
-        puts "Downloading station list from #{url} to #{storePath}" if debug
-        `lynx --dump #{url} > #{storePath}`
-    else
-        puts "Not downloading station list from #{url} to #{storePath}, already got it" if debug
-    end
-    startAt = `grep -n 'Code des stations' #{storePath} | tail -n 1 | cut -d':' -f 1`.strip.to_i
-    lineCount = `wc -l #{storePath} | cut -f 1`.strip.to_i
-    tailArg = lineCount - startAt + 1
-    if city.empty?
-        matches = `tail -n #{tailArg} #{storePath}`.split("\n")
-    else
-        matches = `tail -n #{tailArg} #{storePath} | grep -i #{city}`.split("\n")
-    end
-
-    puts "You may enter:" if matches.count > 0
-    matches.each { |m|
-        code, number, name, lat, long = m.gsub(/\s+/m, ' ').strip.split(" ")
-        puts "#{code} for #{name}"
-    }
-end
 
 def fileOK(path, minLines)
     return ((File.exists?(path)) and (`wc -l "#{path}"`.strip.split(' ')[0].to_i > minLines))
@@ -43,13 +21,13 @@ opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--city', '-c', GetoptLong::REQUIRED_ARGUMENT ],
   [ '--twitter', '-t', GetoptLong::NO_ARGUMENT ],
-  [ '--debug', '-d', GetoptLong::NO_ARGUMENT ],
+  [ '--$debug', '-d', GetoptLong::NO_ARGUMENT ],
 )
 
 
 city='YOW'
 twitter=false
-debug=false
+$debug=false
 
 opts.each do |opt, arg|
   case opt
@@ -58,8 +36,8 @@ opts.each do |opt, arg|
     when '--twitter'
         require_relative './twitterConfig.rb'
         twitter=true
-    when '--debug'
-        debug=true
+    when '--$debug'
+        $debug=true
     else
         puts "[-c|--city {$city}] EC code of the city in question (or search city list).  See later half of http://dd.weather.gc.ca/nowcasting/doc/README_nowcasting_prevision-immediate.txt"
         puts "[-t|--twitter] Push output to twitter"
@@ -97,29 +75,29 @@ end
 
 # Fetch data if necessary
 if refreshECdata
-    puts "Refreshing cache because #{reason}" if (debug or twitter)
+    puts "Refreshing cache because #{reason}" if ($debug or twitter)
     urlBase='http://dd.weather.gc.ca/nowcasting/matrices/?C=M;O=A'
     fileURL=`lynx --dump '#{urlBase}' | tail -n 1 | cut -d ' ' -f 4`.chomp
     `curl -s #{fileURL} | gzip -dc > #{dataLocation}`
 else
-    puts "Not refreshing cache because #{reason}" if (debug or twitter)
+    puts "Not refreshing cache because #{reason}" if ($debug or twitter)
 end
 
 #### Now get the data for your city
 data = `cat #{dataLocation} | grep #{city} -A 28`
 if data.nil? or data.empty?
     puts $stderr.puts "No EC data for #{city}"
-    searchCity(city, debug)
+    searchCity(city, $debug)
     exit 1
 elsif data.split("\n").count > 29
-    searchCity(city, debug)
     puts $stderr.puts "More than one city"
+    Location.searchCity(city, $debug)
     exit 1
 end
 
-puts "Data on data:" if debug
-puts data if (debug or twitter)
-puts data.split("\n").count if debug
+puts "Data on data:" if $debug
+puts data if ($debug or twitter)
+puts data.split("\n").count if $debug
 
 
 ### Get sunset times #################################################
@@ -135,17 +113,17 @@ puts data.split("\n").count if debug
 sunsetLocationCache = "/tmp/tlaloc.sunset.#{city}.html"
 minLines = 60*0.9
 if ! fileOK(sunsetLocationCache, minLines) or File.stat(sunsetLocationCache).mtime < DateTime.now.beginning_of_day()
-    puts "Refreshing sunset times for #{city}" if (debug or twitter)
+    puts "Refreshing sunset times for #{city}" if ($debug or twitter)
     `curl -s http://www.cmpsolv.com/cgi-bin/sunset?loc=#{city} > #{sunsetLocationCache}`
 else
-    puts "Not refereshing sunset times for #{city}" if (debug or twitter)
+    puts "Not refereshing sunset times for #{city}" if ($debug or twitter)
 end
 
 # Get the sunset time from the cached file
 sunsetStr=`cat #{sunsetLocationCache} | grep 'Sunset:'`.strip
 sunset = 'n/a'
 if sunsetStr.split(' ').last.nil?
-    puts $stderr.puts "No sunset data for #{city}" if debug
+    puts $stderr.puts "No sunset data for #{city}" if $debug
 else
     sunset = sunsetStr.split(' ').last.strip
 end
@@ -234,7 +212,7 @@ if twitter
     attempt=0
 
     while(finalStr.length >= 140)
-        puts "#{finalStr.length} chars: #{finalStr}" if debug
+        puts "#{finalStr.length} chars: #{finalStr}" if $debug
         attempt+=1
 
         case attempt
@@ -298,7 +276,7 @@ else
 
 	if client
 	   puts "Client ready"
-       unless debug
+       unless $debug
          r = client.update(finalStr)
 
          if ! r.nil?
@@ -308,7 +286,7 @@ else
             puts "Annouced failed"
          end
       else
-         puts "Debug on, not announcing"
+         puts "$debug on, not announcing"
       end
       puts finalStr
 	else

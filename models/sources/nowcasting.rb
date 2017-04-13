@@ -1,0 +1,3 @@
+class Nowcasting
+    
+end

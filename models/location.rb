@@ -5,6 +5,8 @@ class Location
     @name
     @timezone
 
+    DATA_LOCATION = 'http://dd.meteo.gc.ca/nowcasting/doc/README_INCS-SIPI.txt'
+
 
 
     def self.searchCity(city)
@@ -25,5 +27,9 @@ class Location
             code, number, name, lat, long = m.gsub(/\s+/m, ' ').strip.split(" ")
             puts "#{code} for #{name}"
         }
+    end
+
+    def self.refreshData(dataLocation, fileLocation)
+        `lynx --dump #{dataLocation} > #{fileLocation}`
     end
 end

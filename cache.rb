@@ -6,6 +6,7 @@ class Cache
     @dataLocation
     @refreshTimeShouldBe
     @minLines
+    @confName
 
     NEVER = -1
 
@@ -18,11 +19,12 @@ class Cache
     end
 
     def self.dirname(path)
-        File.dirname(File.expand_path(__FILE__))
+        File.dirname(File.expand_path(path))
     end
 
 
     def initialize(confName)
+        @confName = confName
         Cache.loadConf
         config = $cacheConf[confName]
         @dataLocation = config['dataLocation']
@@ -30,7 +32,7 @@ class Cache
 
         setRefreshTimeShouldBe(config['refresh'])
 
-        setFileLocation(@dataLocation, $cacheStore)
+        setFileLocation(config, $cacheStore)
     end
 
     def setRefreshTimeShouldBe(refreshPolicy)
@@ -39,13 +41,18 @@ class Cache
         end
     end
 
-    def setFileLocation(dataLocation, cacheStore)
-        require 'uri'
-        url = 'http://www.example.com/foo/bar/filename.jpg?2384973948743'
-        uri = URI.parse(url)
-        fileName = File.basename(uri.path)
+    def setFileLocation(config, cacheStore)
 
-        @fileLocation = cacheStore + '/' + fileName
+        if config['fileLocation'].nil?
+            dataLocation = config['dataLocation']
+            require 'uri'
+            uri = URI.parse(dataLocation)
+            fileName = File.basename(uri.path)
+
+            @fileLocation = cacheStore + '/' + fileName
+        else
+            @fileLocation = config['fileLocation']
+        end
     end
 
     def cacheFresh?()
@@ -68,10 +75,18 @@ class Cache
 
     def refresh
         storeDir = Cache.dirname(@fileLocation)
-        IF dir does not exist
-            `mkdir $storeDir`
+        #debugger
+        if ! File.directory?(storeDir)
+            $stderr.puts "Creating dir #{storeDir}" if $debug
+            `mkdir -p #{storeDir}`
+        else
+            $stderr.puts "#{storeDir} exists already" if $debug
         end
-        `lynx --dump #{@dataLocation} > #{@fileLocation}`
+
+        case @confName
+        when 'cityList'
+            Location.refreshData(@dataLocation, @fileLocation)
+        end
     end
 
 

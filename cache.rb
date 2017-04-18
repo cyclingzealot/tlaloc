@@ -10,6 +10,10 @@ class Cache
 
     NEVER = -1
 
+    #Conf names
+    CITY_LIST = 'cityList'
+    NOWCASTING = 'matrixList'
+
     def self.loadConf
         require_relative 'conf/cacheConf.rb'
     end
@@ -38,6 +42,12 @@ class Cache
     def setRefreshTimeShouldBe(refreshPolicy)
         if refreshPolicy == Cache::NEVER
             @refreshTimeShouldBe = Time.new(1971)
+        else
+            n = DateTime.now
+            lastRefreshWasAt = File.stat(@dataLocation).mtime
+            @refreshTimeShouldBe = DateTime.new(n.year, n.month, n.day, n.hour, refreshPolicy, 0, (lastRefreshWasAt.utc_offset/60/60).to_s)
+            @refreshTimeShouldBe -= 1.0/24 if @refreshTimeShouldBe > n
+            @refreshTimeShouldBe -= 1.0/60/24
         end
     end
 
@@ -84,8 +94,11 @@ class Cache
         end
 
         case @confName
-        when 'cityList'
+        when Cache::CITY_LIST
             Location.refreshData(@dataLocation, @fileLocation)
+
+        when Cache::NOWCASTING
+
         end
     end
 

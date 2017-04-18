@@ -55,10 +55,10 @@ puts DateTime.now.rfc2822 if twitter
 
 ### Determine date time of last refresh
 c = Cache.new('matrixList')
-minuteOfCache = 27
-dataLocation = '/tmp/tlaloc.ecData.txt'
-minLines = 21120 * 0.9
-n = DateTime.now
+#minuteOfCache = 27
+#dataLocation = '/tmp/tlaloc.ecData.txt'
+#minLines = 21120 * 0.9
+#n = DateTime.now
 refreshECdata = false
 reason = ''
 if fileOK(dataLocation, minLines)

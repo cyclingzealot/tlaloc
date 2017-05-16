@@ -1,6 +1,9 @@
+require 'sun_times'
+require 'date'
+
 class Location
     @latitude
-    @logitude
+    @longitude
     @code
     @name
     @timezone
@@ -31,5 +34,15 @@ class Location
 
     def self.refreshData(dataLocation, fileLocation)
         `lynx --dump #{dataLocation} > #{fileLocation}`
+    end
+
+
+    def sunrise()
+        SunTimes.new.rise(Date.today, @latitude, @longitude)
+    end
+
+
+    def sunset()
+        SunTimes.new.set(Date.today, @latitude, @longitude)
     end
 end

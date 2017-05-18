@@ -179,19 +179,23 @@ minWindChill=forecasts.min_by {|f| f.windChill}.windChill
 
 minTempFc=forecasts.min_by {|f| f.temp}
 minTemp = minTempFc.temp
+maxTemp = forecasts.max_by {|f| f.temp}
 
 isThereWindChill = current.windChill? || minTempFc.windChill?
 
 untilDateTime=(forecasts.max_by {|f| f.dateTime}.dateTime) + 1*60*60
 untilHour=untilDateTime.hour
 
+worstTempOrChill = minWindChill
+worstTempOrChill = maxTemp if minWindChill >= 20
+
 
 
 ### Decide on string #################################################
 
-windChillLabel = minTemp < 10 ? 'Windchill' : 'Temperature'
+windChillLabel = worstTempOrChill < 10 ? 'Windchill' : 'Temperature'
 
-bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{minWindChill}, POP: #{current.pcpType}/#{maxPop}; Sunset: #{sunset}\n"
+bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{worstTempOrChill}, POP: #{current.pcpType}/#{maxPop}; Sunset: #{sunset}\n"
 
 
 # POP string

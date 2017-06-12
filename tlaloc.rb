@@ -179,7 +179,8 @@ minWindChill=forecasts.min_by {|f| f.windChill}.windChill
 
 minTempFc=forecasts.min_by {|f| f.temp}
 minTemp = minTempFc.temp
-maxTemp = forecasts.max_by {|f| f.temp}
+maxTempFc = forecasts.max_by {|f| f.temp}
+maxTemp = maxTempFc.temp
 
 isThereWindChill = current.windChill? || minTempFc.windChill?
 

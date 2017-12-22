@@ -5,3 +5,5 @@
 twitterConfig.rb
 .buildpath
 .project
+vendor/
+.bundle

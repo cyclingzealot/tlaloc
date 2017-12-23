@@ -45,8 +45,4 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  nokogiri
-  twitter
-
-BUNDLED WITH
-   1.11.2
+  ruby-sun-times

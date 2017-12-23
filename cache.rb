@@ -34,9 +34,10 @@ class Cache
         @dataLocation = config['dataLocation']
         @minLines = config['minLines']
 
+        setFileLocation(config, $cacheStore)
+
         setRefreshTimeShouldBe(config['refresh'])
 
-        setFileLocation(config, $cacheStore)
     end
 
     def setRefreshTimeShouldBe(refreshPolicy)
@@ -44,10 +45,14 @@ class Cache
             @refreshTimeShouldBe = Time.new(1971)
         else
             n = DateTime.now
-            lastRefreshWasAt = File.stat(@dataLocation).mtime
-            @refreshTimeShouldBe = DateTime.new(n.year, n.month, n.day, n.hour, refreshPolicy, 0, (lastRefreshWasAt.utc_offset/60/60).to_s)
-            @refreshTimeShouldBe -= 1.0/24 if @refreshTimeShouldBe > n
-            @refreshTimeShouldBe -= 1.0/60/24
+            if File.exists?(@fileLocation)
+                lastRefreshWasAt = File.stat(@fileLocation).mtime
+                @refreshTimeShouldBe = DateTime.new(n.year, n.month, n.day, n.hour, refreshPolicy, 0, (lastRefreshWasAt.utc_offset/60/60).to_s)
+                @refreshTimeShouldBe -= 1.0/24 if @refreshTimeShouldBe > n
+                @refreshTimeShouldBe -= 1.0/60/24
+            else
+                @refreshTimeShouldBe = DateTime.new(1970)
+            end
         end
     end
 

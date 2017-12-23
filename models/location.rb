@@ -1,5 +1,7 @@
 require 'sun_times'
 require 'date'
+require_relative '../conf/cacheConf.rb'
+
 
 class Location
     @latitude
@@ -8,11 +10,28 @@ class Location
     @name
     @timezone
 
-    DATA_LOCATION = 'http://dd.meteo.gc.ca/nowcasting/doc/README_INCS-SIPI.txt'
+    DATA_LOCATION = $cacheConf['cityList']['dataLocation']
 
 
+    def initialize(code, name, lat, long, skipTZ = FALSE)
+        @code = code
+        @name = name
+        @latitude = lat
+        @longitude = long
+
+        @timezone = Timezone::Zone.new(:latlong => [@latitude, @longitude])
+    end
 
     def self.searchCity(city)
+        cities = Location.createCities(city, TRUE)
+
+        puts "You may enter:" if cities.count > 0
+        cities.each {|c|
+            puts "#{c.code} for #{c.name}"
+        }
+    end
+
+    def self.createCities(city, skipTZ = FALSE)
         c = Cache.new('cityList')
         c.refreshIfRequired()
         storePath = c.getFileLocation()
@@ -25,15 +44,21 @@ class Location
             matches = `tail -n #{tailArg} #{storePath} | grep -i #{city}`.split("\n")
         end
 
-        puts "You may enter:" if matches.count > 0
+        cities = []
         matches.each { |m|
-            code, number, name, lat, long = m.gsub(/\s+/m, ' ').strip.split(" ")
-            puts "#{code} for #{name}"
+            code, syn, name, lat, long = m.gsub(/\s+/m, ' ').strip.split(" ")
+            cities.push(Location.new(code,name,lat,long,skipTZ))
         }
+
+        return cities
     end
 
     def self.refreshData(dataLocation, fileLocation)
         `lynx --dump #{dataLocation} > #{fileLocation}`
+    end
+
+    def getCoordinates
+
     end
 
 

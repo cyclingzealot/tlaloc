@@ -9,6 +9,7 @@ require 'getoptlong'
 require_relative './models/forecast.rb'
 require_relative './cache.rb'
 require_relative './models/location.rb'
+require_relative './models/sources/nowcasting.rb'
 
 
 def fileOK(path, minLines)
@@ -25,14 +26,14 @@ opts = GetoptLong.new(
 )
 
 
-city='YOW'
+cityCode='YOW'
 twitter=false
 $debug=false
 
 opts.each do |opt, arg|
   case opt
     when '--city'
-        city=arg
+        cityCode=arg
     when '--twitter'
         require_relative './twitterConfig.rb'
         twitter=true
@@ -54,46 +55,50 @@ puts DateTime.now.rfc2822 if twitter
 
 
 ### Determine date time of last refresh
-c = Cache.new('matrixList')
+#
 #minuteOfCache = 27
 #dataLocation = '/tmp/tlaloc.ecData.txt'
 #minLines = 21120 * 0.9
 #n = DateTime.now
-refreshECdata = false
-reason = ''
-if fileOK(dataLocation, minLines)
-    lastRefreshWasAt = File.stat(dataLocation).mtime
-    lastRefreshShouldBeAt = DateTime.new(n.year, n.month, n.day, n.hour, minuteOfCache, 0, (lastRefreshWasAt.utc_offset/60/60).to_s)
-    lastRefreshShouldBeAt -= 1.0/24 if lastRefreshShouldBeAt > n
-    lastRefreshShouldBeAt -= 1.0/60/24
-    refreshECdata = lastRefreshWasAt < lastRefreshShouldBeAt
-    reason = "cache dated #{lastRefreshWasAt.rfc2822} is #{refreshECdata ? 'before' : 'after'} #{lastRefreshShouldBeAt.rfc2822}"
-else
-    refreshECdata = true
-    reason = "file does not exist"
-end
+#refreshECdata = false
+#reason = ''
+#if fileOK(dataLocation, minLines)
+#    lastRefreshWasAt = File.stat(dataLocation).mtime
+#    lastRefreshShouldBeAt = DateTime.new(n.year, n.month, n.day, n.hour, minuteOfCache, 0, (lastRefreshWasAt.utc_offset/60/60).to_s)
+#    lastRefreshShouldBeAt -= 1.0/24 if lastRefreshShouldBeAt > n
+#    lastRefreshShouldBeAt -= 1.0/60/24
+#    refreshECdata = lastRefreshWasAt < lastRefreshShouldBeAt
+#    reason = "cache dated #{lastRefreshWasAt.rfc2822} is #{refreshECdata ? 'before' : 'after'} #{lastRefreshShouldBeAt.rfc2822}"
+#else
+#    refreshECdata = true
+#    reason = "file does not exist"
+#end
 
-
+# RENDU ICI:  We need to figure out how to refresh the data location at time of call back.
 # Fetch data if necessary
-if refreshECdata
-    puts "Refreshing cache because #{reason}" if ($debug or twitter)
-    urlBase='http://dd.weather.gc.ca/nowcasting/matrices/?C=M;O=A'
-    fileURL=`lynx --dump '#{urlBase}' | tail -n 1 | cut -d ' ' -f 4`.chomp
-    `curl -s #{fileURL} | gzip -dc > #{dataLocation}`
-else
-    puts "Not refreshing cache because #{reason}" if ($debug or twitter)
-end
+#if refreshECdata
+#    puts "Refreshing cache because #{reason}" if ($debug or twitter)
+#    urlBase='http://dd.weather.gc.ca/nowcasting/matrices/?C=M;O=A'
+#    fileURL=`lynx --dump '#{urlBase}' | tail -n 1 | cut -d ' ' -f 4`.chomp
+#    `curl -s #{fileURL} | gzip -dc > #{dataLocation}`
+#else
+#    puts "Not refreshing cache because #{reason}" if ($debug or twitter)
+#end
 
-#### Now get the data for your city
-data = `cat #{dataLocation} | grep #{city} -A 28`
+#### Now get the data for your cityCode
+debugger
+data = Nowcasting.getDataForCity(cityCode)
+location = nil
 if data.nil? or data.empty?
     puts $stderr.puts "No EC data for #{city}"
-    Location.searchCity(city)
+    Location.searchCity(cityCode)
     exit 1
 elsif data.split("\n").count > 29
     puts $stderr.puts "More than one city"
-    Location.searchCity(city)
+    Location.searchCity(cityCode)
     exit 1
+else
+    location = Location.createCities(cityCode)
 end
 
 puts "Data on data:" if $debug
@@ -111,24 +116,26 @@ puts data.split("\n").count if $debug
 ## and use https://github.com/joeyates/ruby-sun-times to calculate
 
 # First store the file if it's a new day
-sunsetLocationCache = "/tmp/tlaloc.sunset.#{city}.html"
-minLines = 60*0.9
-if ! fileOK(sunsetLocationCache, minLines) or File.stat(sunsetLocationCache).mtime < DateTime.now.beginning_of_day()
-    puts "Refreshing sunset times for #{city}" if ($debug or twitter)
-    `curl -s http://www.cmpsolv.com/cgi-bin/sunset?loc=#{city} > #{sunsetLocationCache}`
-else
-    puts "Not refereshing sunset times for #{city}" if ($debug or twitter)
-end
+#sunsetLocationCache = "/tmp/tlaloc.sunset.#{city}.html"
+#minLines = 60*0.9
+#if ! fileOK(sunsetLocationCache, minLines) or File.stat(sunsetLocationCache).mtime < DateTime.now.beginning_of_day()
+#    puts "Refreshing sunset times for #{city}" if ($debug or twitter)
+#    `curl -s http://www.cmpsolv.com/cgi-bin/sunset?loc=#{city} > #{sunsetLocationCache}`
+#else
+#    puts "Not refereshing sunset times for #{city}" if ($debug or twitter)
+#end
+#
+## Get the sunset time from the cached file
+#sunsetStr=`cat #{sunsetLocationCache} | grep 'Sunset:'`.strip
+#sunset = 'n/a'
+#if sunsetStr.split(' ').last.nil?
+#    puts $stderr.puts "No sunset data for #{city}" if $debug
+#else
+#    sunset = sunsetStr.split(' ').last.strip
+#end
 
-# Get the sunset time from the cached file
-sunsetStr=`cat #{sunsetLocationCache} | grep 'Sunset:'`.strip
-sunset = 'n/a'
-if sunsetStr.split(' ').last.nil?
-    puts $stderr.puts "No sunset data for #{city}" if $debug
-else
-    sunset = sunsetStr.split(' ').last.strip
-end
-
+# RENDU ICI: we need to get the lat long => timezone to work
+sunset = location.sunset
 
 
 
@@ -200,13 +207,13 @@ finalStr = bodyStr
 ### Decide on string if twitter ######################################
 i=0
 if twitter
-    if $clientConf[city].nil?
-        $stderr.puts "No configuration for city #{city}, can't announce"
+    if $clientConf[cityCode].nil?
+        $stderr.puts "No configuration for city #{cityCode}, can't announce"
         exit 1
     end
 
-    weatherHashTag  = $clientConf[city]['weatherHashTag']
-    bikeHashTag     = $clientConf[city]['bikeHashTag']
+    weatherHashTag  = $clientConf[cityCode]['weatherHashTag']
+    bikeHashTag     = $clientConf[cityCode]['bikeHashTag']
 
     twitterMaxChars = 140
     finalStr = '#' * (twitterMaxChars + 10)
@@ -273,7 +280,7 @@ finalStr.strip!
 unless twitter
     puts finalStr
 else
-	client = Twitter::REST::Client.new($clientConf[city])
+	client = Twitter::REST::Client.new($clientConf[cityCode])
 
 	if client
 	   puts "Client ready"

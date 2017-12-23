@@ -1,9 +1,8 @@
 $cacheConf = { 'sunset' => {
  'dataLocation'     => "xmINxak4tZ6YmqnwcfkfnWN6q",
  'minLines'         => "795219625957031936-wLW2IM902wQpevD23BWkPwNadE5duam",
- 'refresh'          =>  "" ,
+ 'refresh'          =>  Cache::NEVER ,
 }, 'matrixList' => {
- 'dataLocation'     => "xmINxak4tZ6YmqnwcfkfnWN6q",
  'fileLocation'     => '/tmp/tlaloc.ecData.txt',
  'minLines'         => 21120 * 0.9,
  'refresh'          =>  27 ,
@@ -15,3 +14,4 @@ $cacheConf = { 'sunset' => {
 }
 
 $cacheStore        = "/tmp/tlaloc/"
+

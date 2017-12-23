@@ -15,3 +15,4 @@ $cacheConf = { 'sunset' => {
 
 $cacheStore        = "/tmp/tlaloc/"
 
+$debug              = true

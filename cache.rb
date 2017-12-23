@@ -72,9 +72,9 @@ class Cache
 
     def cacheFresh?()
         if File.exists?(@fileLocation)
-            File.stat(@fileLocation).mtime >= @refreshTimeShouldBe
+            File.stat(@fileLocation).mtime >= @refreshTimeShouldBe && File.size(@fileLocation) > 0
         else
-            FALSE
+            false
         end
     end
 
@@ -91,6 +91,8 @@ class Cache
     def refresh
         storeDir = Cache.dirname(@fileLocation)
         #debugger
+
+        #Create the parent directory if required
         if ! File.directory?(storeDir)
             $stderr.puts "Creating dir #{storeDir}" if $debug
             `mkdir -p #{storeDir}`
@@ -103,7 +105,8 @@ class Cache
             Location.refreshData(@dataLocation, @fileLocation)
 
         when Cache::NOWCASTING
-
+            # Something needs to go here.
+            Nowcasting.refreshData()
         end
     end
 

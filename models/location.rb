@@ -31,7 +31,7 @@ class Location
         }
     end
 
-    def self.createCities(city, skipTZ = FALSE)
+    def self.createCities(city, skipTZ = false)
         c = Cache.new('cityList')
         c.refreshIfRequired()
         storePath = c.getFileLocation()

@@ -88,7 +88,7 @@ debugger
 data = Nowcasting.getDataForCity(cityCode)
 location = nil
 if data.nil? or data.empty?
-    puts $stderr.puts "No EC data for #{city}"
+    puts $stderr.puts "No EC data for #{cityCode}"
     Location.searchCity(cityCode)
     exit 1
 elsif data.split("\n").count > 29

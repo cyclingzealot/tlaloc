@@ -1,6 +1,7 @@
 require 'sun_times'
 require 'date'
 require_relative '../conf/cacheConf.rb'
+require 'timezone'
 
 
 class Location
@@ -31,7 +32,15 @@ class Location
         }
     end
 
-    def self.createCities(city, skipTZ = false)
+
+    def self.createLocation(cityCode, skipTZ=false)
+        self.createLocations(skipTZ)[cityCode]
+    end
+
+
+    ### Reads the entre city list and returns an array of locations with their
+    ### code, name and lat long
+    def self.createLocations(skipTZ = false)
         c = Cache.new('cityList')
         c.refreshIfRequired()
         storePath = c.getFileLocation()
@@ -44,10 +53,10 @@ class Location
             matches = `tail -n #{tailArg} #{storePath} | grep -i #{city}`.split("\n")
         end
 
-        cities = []
+        cities = {}
         matches.each { |m|
             code, syn, name, lat, long = m.gsub(/\s+/m, ' ').strip.split(" ")
-            cities.push(Location.new(code,name,lat,long,skipTZ))
+            cities[code] = (Location.new(code,name,lat,long,skipTZ))
         }
 
         return cities

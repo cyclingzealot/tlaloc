@@ -84,7 +84,6 @@ puts DateTime.now.rfc2822 if twitter
 #end
 
 #### Now get the data for your cityCode
-debugger
 data = Nowcasting.getDataForCity(cityCode)
 location = nil
 if data.nil? or data.empty?
@@ -96,7 +95,7 @@ elsif data.split("\n").count > 29
     Location.searchCity(cityCode)
     exit 1
 else
-    location = Location.createCities(cityCode)
+    location = Location.createLocation(cityCode)
 end
 
 puts "Data on data:" if $debug

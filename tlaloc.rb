@@ -87,11 +87,11 @@ end
 data = `cat #{dataLocation} | grep #{city} -A 28`
 if data.nil? or data.empty?
     puts $stderr.puts "No EC data for #{city}"
-    searchCity(city, $debug)
+    Location.searchCity(city)
     exit 1
 elsif data.split("\n").count > 29
     puts $stderr.puts "More than one city"
-    Location.searchCity(city, $debug)
+    Location.searchCity(city)
     exit 1
 end
 

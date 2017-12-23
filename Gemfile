@@ -1,4 +1,6 @@
 source 'https://rubygems.org'
-
-gem 'nokogiri'
+gem 'ruby-sun-times', require: 'sun_times'
+gem: 'nokogiri'
+gem: 'open-uri'
+gem: 'getoptlong'
 gem 'twitter'

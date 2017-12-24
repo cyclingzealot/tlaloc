@@ -229,11 +229,11 @@ if twitter
     weatherHashTag  = $clientConf[city]['weatherHashTag']
     bikeHashTag     = $clientConf[city]['bikeHashTag']
 
-    twitterMaxChars = 140
+    twitterMaxChars = 280
     finalStr = '#' * (twitterMaxChars + 10)
     attempt=0
 
-    while(finalStr.length >= 140)
+    while(finalStr.length >= twitterMaxChars)
         puts "#{finalStr.length} chars: #{finalStr}" if debug
         attempt+=1
 

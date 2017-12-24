@@ -17,8 +17,9 @@ class Location
     def initialize(code, name, lat, long, skipTZ = FALSE)
         @code = code
         @name = name
-        @latitude = lat
-        @longitude = long
+        @latitude = lat.to_f
+        @longitude = long.to_f
+
 
         @timezone = Timezone::Zone.new(:latlong => [@latitude, @longitude])
     end
@@ -33,24 +34,19 @@ class Location
     end
 
 
-    def self.createLocation(cityCode, skipTZ=false)
-        self.createLocations(skipTZ)[cityCode]
-    end
-
-
     ### Reads the entre city list and returns an array of locations with their
     ### code, name and lat long
-    def self.createLocations(skipTZ = false)
+    def self.createLocations(cityCode, skipTZ = false)
         c = Cache.new('cityList')
         c.refreshIfRequired()
         storePath = c.getFileLocation()
         startAt = `grep -n 'Code des stations' #{storePath} | tail -n 1 | cut -d':' -f 1`.strip.to_i
         lineCount = `wc -l #{storePath} | cut -f 1`.strip.to_i
         tailArg = lineCount - startAt + 1
-        if city.empty?
+        if cityCode.empty?
             matches = `tail -n #{tailArg} #{storePath}`.split("\n")
         else
-            matches = `tail -n #{tailArg} #{storePath} | grep -i #{city}`.split("\n")
+            matches = `tail -n #{tailArg} #{storePath} | grep -i #{cityCode}`.split("\n")
         end
 
         cities = {}

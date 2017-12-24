@@ -95,7 +95,8 @@ elsif data.split("\n").count > 29
     Location.searchCity(cityCode)
     exit 1
 else
-    location = Location.createLocation(cityCode)
+    locations = Location.createLocations(cityCode)
+    location = locations.first[1]
 end
 
 puts "Data on data:" if $debug
@@ -135,12 +136,12 @@ puts data.split("\n").count if $debug
 sunset = location.sunset
 
 
-
 ### Process data into forecasts objects ##############################
 
 # Keep 7th line of data (12th line of output) until the time is 2 AM Zulu
 currentLine=data.split("\n")[11]
 
+# REARCH TODO: change this into creator for a NowcastEntry or NowcastLine?
 current = Forecast.new(currentLine)
 
 forecastStrings=data.split("\n")
@@ -154,6 +155,7 @@ forecasts = forecastStrings[11..forecastStrings.size-1].map { |l|
 
 ### Calculate worst cases ############################################
 
+# REARCH TODO: This will be an anlysis
 maxPop=forecasts.max_by {|f|
     f.pop
 }.pop
@@ -176,6 +178,9 @@ worstTempOrChill = maxTemp if minWindChill >= 20
 
 
 ### Decide on string #################################################
+
+
+# REARCH: This would be an analysis interacting with a channel?
 
 windChillLabel = worstTempOrChill < 10 ? 'Windchill' : 'Temperature'
 
@@ -202,6 +207,10 @@ finalStr = bodyStr
 
 
 ### Decide on string if twitter ######################################
+
+# REARCH: This logic would all go in the twitter channel, most likely
+
+
 i=0
 if twitter
     if $clientConf[cityCode].nil?
@@ -273,6 +282,9 @@ finalStr.strip!
 
 
 ### Ouput / publish ##################################################
+
+
+# REARCH: Goes in channel or broadcast class
 
 unless twitter
     puts finalStr

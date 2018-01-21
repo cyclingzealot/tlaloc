@@ -1,0 +1,112 @@
+English Abbreviated Forecast Descriptions,,
+,,
+"Note: This list is a summary of the icons used to represent forecast conditions. Users may note descriptions in our forecast data which are slightly different from these icon code descriptions. In addition, this is only a sampling of the text that will be used in the abbreviated forecast descriptions.",,
+,,
+Icon Code,English Description,Icon Represents
+0,Sunny,Day Conditions Only
+,,
+1,A few clouds,Day Conditions Only
+2,A mix of sun and cloud,Day Conditions Only
+2,Cloudy periods,Day Conditions Only
+2,Sunny with cloudy periods,Day Conditions Only
+3,Cloudy periods,Day Conditions Only
+3,Cloudy with sunny periods,Day Conditions Only
+4,Increasing cloudiness,Day Conditions Only
+5,Clearing,Day Conditions Only
+6,Chance of showers,Day Conditions Only
+6,A few showers,Day Conditions Only
+6,Chance of drizzle or rain,Day Conditions Only
+7,A few flurries or rain showers,Day Conditions Only
+7,Chance of flurries or rain showers,Day Conditions Only
+8,A few flurries,Day Conditions Only
+8,Chance of flurries,Day Conditions Only
+8,A few wet flurries,Day Conditions Only
+9,Chance of showers at times heavy or thundershowers,Day Conditions Only
+9,Chance of showers at times heavy or thunderstorms,Day Conditions Only
+9,Chance of showers at times heavy or thundershowers,Day Conditions Only
+9,Chance of showers at times heavy or thunderstorms,Day Conditions Only
+9,Chance of thundershowers,Day Conditions Only
+9,Chance of thunderstorms,Day Conditions Only
+9,Chance of showers or thundershowers,Day Conditions Only
+9,Chance of showers or thunderstorms,Day Conditions Only
+9,A few flurries or thundershowers,Day Conditions Only
+10,Cloudy,Day and Night Conditions
+10,Overcast,Day and Night Conditions
+12,Showers,Day and Night Conditions
+12,Chance of showers,Day and Night Conditions
+13,Periods of rain,Day and Night Conditions
+13,Mostly Cloudy,Day and Night Conditions
+13,Rain at times heavy,Day and Night Conditions
+13,A few showers or drizzle,Day and Night Conditions
+13,Rain,Day and Night Conditions
+14,Chance of freezing rain,Day and Night Conditions
+14,Freezing rain,Day and Night Conditions
+14,Chance of freezing rain or rain,Day and Night Conditions
+14,Chance of rain or freezing rain,Day and Night Conditions
+15,A few rain showers or flurries,Day and Night Conditions
+15,Periods of rain or snow,Day and Night Conditions
+15,A few rain showers or wet flurries,Day and Night Conditions
+15,Snow mixed with rain,Day and Night Conditions
+15,Chance of snow mixed with freezing rain,Day and Night Conditions
+15,Wet snow or rain,Day and Night Conditions
+16,Flurries,Day and Night Conditions
+16,Light snow,Day and Night Conditions
+16,Wet flurries,Day and Night Conditions
+16,Wet snow,Day and Night Conditions
+17,Snow at times heavy,Day and Night Conditions
+17,Periods of snow,Day and Night Conditions
+17,Snow,Day and Night Conditions
+17,Chance of snow,Day and Night Conditions
+17,Snow squalls,Day and Night Conditions
+17,Local snow squalls,Day and Night Conditions
+18,Blizzard,Day and Night Conditions
+18,Near blizzard,Day and Night Conditions
+18,Snow and blizzard,Day and Night Conditions
+18,Snow at times heavy and blowing snow,Day and Night Conditions
+19,A few showers or thundershowers,Day and Night Conditions
+19,A few showers or thunderstorms,Day and Night Conditions
+19,Showers or thundershowers,Day and Night Conditions
+19,Showers or thunderstorms,Day and Night Conditions
+19,Rain or thunderstorms,Day and Night Conditions
+19,Rain or thundershowers,Day and Night Conditions
+19,Chance of thunderstorms and possible hail,Day and Night Conditions
+19,Thunderstorms and possible hail,Day and Night Conditions
+22,A mix of sun and cloud,Day and Night Conditions
+23,Haze,Day and Night Conditions
+24,Fog,Day and Night Conditions
+24,Fog Patches,Day and Night Conditions
+24,Fog dissipating,Day and Night Conditions
+24,Fog developing,Day and Night Conditions
+24,Ice fog,Day and Night Conditions
+24,Ice fog developing,Day and Night Conditions
+24,Ice fog dissipating,Day and Night Conditions
+27,A few flurries mixed with ice pellets,Day and Night Conditions
+27,Ice pellet,Day and Night Conditions
+27,Ice pellet mixed with freezing rain,Day and Night Conditions
+27,Ice pellet mixed with snow,Day and Night Conditions
+27,Ice pellet or snow,Day and Night Conditions
+28,Possibility of drizzle mixed with freezing drizzle,Day and Night Conditions
+28,Drizzle,Day and Night Conditions
+28,Freezing drizzle,Day and Night Conditions
+28,Possibility of drizzle,Day and Night Conditions
+28,Drizzle or freezing drizzle,Day and Night Conditions
+29,Not available,Day and Night Conditions
+30,Clear,Night Conditions Only
+31,A few clouds,Night Conditions Only
+32,Cloudy periods,Night Conditions Only
+33,Cloudy,Night Conditions Only
+34,Increasing cloudiness,Night Conditions Only
+35,Clearing,Night Conditions Only
+36,Chance of showers,Night Conditions Only
+36,A few showers,Night Conditions Only
+36,Chance of drizzle or rain,Night Conditions Only
+37,A few flurries or showers,Night Conditions Only
+37,Chance of snow or rain,Night Conditions Only
+38,A few flurries,Night Conditions Only
+38,Chance of light snow,Night Conditions Only
+38,A few wet flurries,Night Conditions Only
+39,Chance of showers at times heavy or thunderstorms,Night Conditions Only
+39,Chance of thunderstorms,Night Conditions Only
+40,Snow and blowing snow,Day and Night Conditions
+43,Windy,Day and Night Conditions
+44,Smoke,Day and Night Conditions

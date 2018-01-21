@@ -1,0 +1,103 @@
+Descriptions des prévisions abrégées,,
+,,
+"Note: Cette liste est un résumé des icones utilisés pour représenter les conditions de prévision. Les utilisateurs verront occasionellement des descriptions dans nos prévisions qui sont légèrement différentes de cette description des icones. De plus, ceci ne n'est qu'un échantillon des textes qui seront utilisés dans les descriptions des prévisions abrégées.",,
+,,
+Codage des icônes,Description française,Ce que l'icône représente
+0,Ensoleillé,Conditions du jour seulement
+1,Quelques nuages,Conditions du jour seulement
+2,Passages nuageux,Conditions du jour seulement
+2,Ensoleillé avec passages nuageux,Conditions du jour seulement
+2,Alternance de soleil et de nuages,Conditions du jour seulement
+3,Passages nuageux,Conditions du jour seulement
+3,Nuageux avec percées de soleil,Conditions du jour seulement
+4,Ennuagement graduel,Conditions du jour seulement
+5,Dégagement,Conditions du jour seulement
+6,Possibilité d'averses de pluie,Conditions du jour seulement
+6,Quelques averses de pluie,Conditions du jour seulement
+6,Possibilité de bruine ou de pluie,Conditions du jour seulement
+7,Quelques averses de neige ou de pluie,Conditions du jour seulement
+7,Possibilité de neige ou de pluie,Conditions du jour seulement
+8,Quelques averses de neige,Conditions du jour seulement
+8,Possibilité d'averses de neige,Conditions du jour seulement
+8,Quelques averses de neige fondante,Conditions du jour seulement
+9,Possibilité d'averses de pluie parfois fortes ou orages,Conditions du jour seulement
+9,Possibilité d'orages,Conditions du jour seulement
+9,Possibilité d'averses de pluie ou orages,Conditions du jour seulement
+9,Quelques averses de neige ou orages,Conditions du jour seulement
+10,Nuageux,Conditions du jour et de la nuit
+10,Couvert,Conditions du jour et de la nuit
+12,Averses de pluie,Conditions du jour et de la nuit
+12,Possibilité d'averses de pluie,Conditions du jour et de la nuit
+13,Pluie passagère (intermittente),Conditions du jour et de la nuit
+13,Généralement nuageux,Conditions du jour et de la nuit
+13,Pluie parfois forte,Conditions du jour et de la nuit
+13,Quelques averses de pluie ou bruine,Conditions du jour et de la nuit
+13,Pluie,Conditions du jour et de la nuit
+14,Possibilité de pluie verglaçante,Conditions du jour et de la nuit
+14,Pluie verglaçante,Conditions du jour et de la nuit
+14,Possibilité de pluie verglaçante ou de pluie,Conditions du jour et de la nuit
+14,Possibilité de pluie ou de pluie verglaçante,Conditions du jour et de la nuit
+15,Quelques averses de pluie ou de neige,Conditions du jour et de la nuit
+15,Pluie ou neige passagères (intermittente),Conditions du jour et de la nuit
+15,Quelques averses de pluie ou de neige fondante,Conditions du jour et de la nuit
+15,Neige mêlée de pluie,Conditions du jour et de la nuit
+15,Possibilité de neige mêlée de pluie verglaçante,Conditions du jour et de la nuit
+15,Neige mouillée ou de la pluie,Conditions du jour et de la nuit
+16,Averses de neige,Conditions du jour et de la nuit
+16,Faible neige,Conditions du jour et de la nuit
+16,Neige fondante,Conditions du jour et de la nuit
+17,Neige parfois forte,Conditions du jour et de la nuit
+17,Neige passagères (intermittentes),Conditions du jour et de la nuit
+17,Neige,Conditions du jour et de la nuit
+17,Possibilité de neige,Conditions du jour et de la nuit
+17,Bourrasques de neige,Conditions du jour et de la nuit
+17,Bourrasques de neige par endroits,Conditions du jour et de la nuit
+18,Blizzard,Conditions du jour et de la nuit
+18,Quasi blizzard,Conditions du jour et de la nuit
+18,Neige et blizzard,Conditions du jour et de la nuit
+18,Neige parfois forte et poudrerie,Conditions du jour et de la nuit
+19,Quelques averses de pluie ou orages,Conditions du jour et de la nuit
+19,Averses de pluie ou orages,Conditions du jour et de la nuit
+19,Pluie ou orages,Conditions du jour et de la nuit
+19,Pluie ou orages,Conditions du jour et de la nuit
+19,Possibilité d'orages et possibilité de grêle,Conditions du jour et de la nuit
+19,Orages et possibilité de grêle,Conditions du jour et de la nuit
+22,Alternance de soleil et de nuages,Conditions du jour et de la nuit
+23,Brume sèche,Conditions du jour et de la nuit
+24,Brouillard,Conditions du jour et de la nuit
+24,Bancs de brouillard,Conditions du jour et de la nuit
+24,Brouillard se dissipant,Conditions du jour et de la nuit
+24,Brouillard se formant,Conditions du jour et de la nuit
+24,Brouillard glacé,Conditions du jour et de la nuit
+24,Brouillard glacé se dissipant,Conditions du jour et de la nuit
+24,Brouillard glacé se formant,Conditions du jour et de la nuit
+27,Quelques averses de neige mêlée de grésil,Conditions du jour et de la nuit
+27,Grésil,Conditions du jour et de la nuit
+27,Grésil mêlée de pluie verglaçante,Conditions du jour et de la nuit
+27,Grésil mêlée de neige,Conditions du jour et de la nuit
+27,Grésil ou neige,Conditions du jour et de la nuit
+28,Possibilités de pluie mélangée avec la bruine verglaçante,Conditions du jour et de la nuit
+28,Bruine,Conditions du jour et de la nuit
+28,Bruine verglaçante,Conditions du jour et de la nuit
+28,Possibilité de bruine mêlée de bruine verglaçante,Conditions du jour et de la nuit
+28,Bruine ou la bruine verglaçante,Conditions du jour et de la nuit
+29,Non disponible,Conditions du jour et de la nuit
+30,Dégagé,Conditions de la nuit seulement
+31,Quelques nuages,Conditions de la nuit seulement
+32,Passages nuageux,Conditions de la nuit seulement
+33,Nuageux,Conditions de la nuit seulement
+34,Ennuagement graduel,Conditions de la nuit seulement
+35,Dégagement,Conditions de la nuit seulement
+36,Possibilité d'averses de pluie,Conditions de la nuit seulement
+36,Quelques averses de pluie,Conditions de la nuit seulement
+36,Possibilité de bruine ou de pluie,Conditions de la nuit seulement
+37,Quelques averses de neige ou de pluie,Conditions de la nuit seulement
+37,Possibilité de neige ou de pluie,Conditions de la nuit seulement
+38,Quelques averses de neige,Conditions de la nuit seulement
+38,Possibilité de faible neige,Conditions de la nuit seulement
+38,Quelques averses de neige fondante,Conditions de la nuit seulement
+39,Possibilité d'averses de pluie parfois fortes ou orages,Conditions de la nuit seulement
+39,Possibilités d'orages,Conditions de la nuit seulement
+40,Neige et poudrerie,Conditions du jour et de la nuit
+43,Venteux,Conditions du jour et de la nuit
+44,Fumée,Conditions du jour et de la nuit

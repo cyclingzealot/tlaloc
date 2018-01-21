@@ -1,0 +1,57 @@
+Tableau des balises et attributs du site-XML,,,,
+
+Titre de la balise,Balises parents associées,Balises enfants associées,Noms d'attribut valides,Description de la valeur
+siteData,N/A,"dateTime, location, warnings, currentConditions, forecastGroup, yesterdayConditions, riseset, almanac, license","xmlns:xsi, xsi:noNamespaceSchemaLocation",Présente la balise parent d'ensemble et fixe les données du site à l'aide des balises enfants.
+dateTime,"siteData, currentConditions, forecastGroup, hourlyForecastGroup, riseSet","year, month, day, hour, minute, timeStamp, textSummary","name, zone, UTCOFFset",Fixe la date et les valeurs temporelles à l'aide des balises enfants.
+year,dateTime,N/A,N/A,Fixe l'année (4 chiffres)
+month,dateTime,N/A,name,Fixe le mois (de 01 à 12)
+day,dateTime,N/A,name,Fixe le jour (de 01 à 31)
+hour,dateTime,N/A,N/A,Fixe l'heure (de 00 à 23)
+minute,dateTime,N/A,N/A,Fixe les minutes (de 00 à 59)
+timeStamp,dateTime,N/A,N/A,Fixe l'horodateur (aaaammjjhhmm)
+textSummary,"dateTime, regionalNormals, forecast, cloudPrecip, abbreviatedForecast, temperatures, precipitation, winds, comfort",N/A,N/A,"Présente une chaîne de texte général afin de décrire les renseignements de la balise parent (p. ex. le jeudi 2 novembre 2006, à 18 h 1 UTC)"
+location,siteData,"continent, country, province, name, region",N/A,Décrit l'emplacement des données à l'aide des balises enfants.
+continent,location,N/A,N/A,Présente une chaîne de texte qui décrit le continent des données
+country,location,N/A,code,Présente une chaîne de texte qui décrit le pays des données.
+province,location,N/A,code,Présente une chaîne de texte qui décrit la province des données.
+name,location,N/A,code,Présente une chaîne de texte qui décrit le site des données.
+region,location,N/A,N/A,Présente une chaîne de texte qui décrit la région des données.
+warnings,siteData,event,URL,Indique qu'il y a un avertissement ou une veille émis.
+event,warnings,dateTime,"type, priority, description",Décrit le type d'avertissement ou de veille émis.
+currentConditions,siteData,"station, dateTime, condition, iconCode, temperature, dewpoint, pressure, visibility, relativeHumidity, wind",N/A,Fixe les conditions actuelles à l'aide des balises enfants.
+station,currentConditions,N/A,"code,lat,lon",Présente une chaîne de texte qui décrit la station (p. ex. l'aéroport de Yellowknife).
+condition,"currentConditions,hourlyForecast",textSummary,iconCode,Présente une chaîne de texte qui décrit les conditions météorologiques (p. ex. généralement nuageux).
+iconCode,"currentConditions, abbreviatedForecast, hourlyForecast",N/A,format,text string setting the icon code (eg. 01)
+temperature,"currentConditions, regionalNormals, temperatures, yesterdayConditions, almanac, hourlyForecast",N/A,"unitType, units, class, period, year","Présente une chaîne de texte qui décrit la température (p. ex. -10,5)."
+dewpoint,currentConditions,N/A,"unitType, units","Présente une chaîne de texte qui décrit le point de rosée (p. ex. -11,5)."
+pressure,currentConditions,N/A,"unitType, units, change, tendency","Présente une chaîne de texte qui décrit la pression atmosphérique (p. ex. 103,2)."
+visibility,currentConditions,N/A,"unitType, units","Présente une chaîne de texte qui décrit la visibilité (p. ex. 24,1)."
+relativeHumidity,"currentConditions, forecast",N/A,units,"Présente une chaîne de texte qui décrit l'humidité relative (p. ex. 93)."
+wind,"currentConditions, winds, hourlyForecast","speed, gust, direction, bearing","index, rank",Fixe les données relatives au vent à l'aide des balises enfants.
+speed,wind,N/A,"unitType, units",Présente une chaîne de texte qui établit la vitesse du vent (p. ex. 4).
+gust,wind,N/A,"unitType, units",Présente une chaîne de texte qui établit la vitesse des rafales de vent (p. ex. 25)
+direction,wind,N/A,"units,windDirFull",Présente une chaîne de texte qui établit la direction du vent selon les 16 points du compas (p.ex. NNE).
+bearing,wind,N/A,units,Présente une chaîne de texte qui établit le relèvement et la direction du vent (p. ex. 30).
+forecastGroup,siteData,"dateTime, regionalNormals, forecast",N/A,Établit toutes les prévisions à l'aide des balises enfants.
+regionalNormals,forecastGroup,"textSummary, Temperature",N/A,Établit les renseignements des normales régionales à l'aide des balises enfants.
+forecast,forecastGroup,"period, textSummary, cloudPrecip, abbreviatedForecast, temperatures, winds, precipitation, relativeHumidity, comfort",N/A,Établit les prévisions météorologiques à l'aide des balises enfants.
+period,,N/A,textForecastName,Présente une chaîne de texte qui établit la période des prévisions (p. ex. jeudi).
+cloudPrecip,forecast,textSummary,N/A,Établit les conditions météorologiques dans les balises enfants.
+abbreviatedForecast,forecast,"iconCode, pop, textSummary",N/A,Établit les prévisions abrégées à l'aide des balises enfants.
+pop,"abbreviatedForecast, almanac",N/A,units,Présente une chaîne de texte qui établit les probabilités de précipitations pour la période de prévision (p. ex. 60).
+temperatures,forecast,"textSummary, Temperature",N/A,Établit la température pour la période de prévision à l'aide des balises enfants.
+winds,forecast,"textSummary, wind",N/A,Établit les données relatives au vent pour la période de prévision à l'aide des balises enfants.
+precipitation,"forecast, almanac","textSummary, precipType","class, period, unitType, year","Établit les renseignements relatifs aux précipitaions pour la période de prévision ou donnera la quantité de précipitations à l'aide des balises enfants (p. ex. 11,70)."
+precipType,precipitation,N/A,"start, end",Présente une chaîne de texte qui montre le type de précipitations (p. ex. neige).
+yesterdayConditions,siteData,"temperature, precip",N/A,Établit les conditions météorologiques des derniers jours à l'aide des balises enfants.
+precip,yesterdayConditions,,"unitType, units","Présente une chaîne de texte qui montre la quantité de précipitations reçue (p. ex. 0,2)."
+riseSet,siteData,"dateTime, disclaimer",N/A,Fournira les renseignements relatifs au lever et au coucher du soleil ainsi qu'au lever et au coucher de la lune à l'aide des balises enfants.
+almanac,siteData,"temperature, precipitation, pop",N/A,Fournit les renseignements relatifs aux conditions climatiques extrêmes à l'aide des balises enfants.
+license,siteData,N/A,N/A,Présente une chaîne de texte qui fournit des renseignements abrégés de la licence de même que l'URL de la licence complète.
+disclaimer,riseSet,N/A,N/A,Présente une chaîne de texte qui fournit des renseignements additionnels sur la balise parent.
+comfort,forecast,textSummary,N/A,Présente une chaîne de texte qui donne le niveau de confort (p. ex. froid).
+hourlyForecastGroup,siteData,hourlyForecast,N/A,"Établit toutes les prévisions horaires à l'aide des balises enfants"
+hourlyForecast,hourlyForecastGroup,"condition,iconCode,temperature,lop,windChill,humidex,wind",dateTimeUTC,"Établit toutes les prévisions horaires à l'aide des balises enfants"
+lop,hourlyForecast,N/A,"category,units","Présente une chaîne de texte qui décrit l'éventualité de précipitation (Edp)"
+windChill,"hourlyForecast,forecast,currentConditions","textSummary,calculated",unitType,"Présente une chaîne de texte qui décrit le refroidissement éolien"
+humidex,hourlyForecast,"textSummary,calculated",unitType,"Présente une chaîne de texte qui décrit l'humidex"

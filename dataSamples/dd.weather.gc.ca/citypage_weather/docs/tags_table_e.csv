@@ -1,0 +1,57 @@
+Site XML Tags and Attributes Table,,,,
+
+Tag Name,Associated Parent Tags,Associated Child Tags,Valid Attribute Names,Value Description
+siteData,N/A,"dateTime, location, warnings, currentConditions, forecastGroup, yesterdayConditions, riseset, almanac, license","xmlns:xsi, xsi:noNamespaceSchemaLocation",overall parent tag and sets the data for the site through its children
+dateTime,"siteData, currentConditions, forecastGroup, hourlyForecastGroup, riseSet","year, month, day, hour, minute, timeStamp, textSummary","name, zone, UTCOFFset",sets date and time values through its children's tags
+year,dateTime,N/A,N/A,sets year value(4 digits)
+month,dateTime,N/A,name,sets month value(01-12)
+day,dateTime,N/A,name,sets day value(1-31)
+hour,dateTime,N/A,N/A,sets hour value(00-23)
+minute,dateTime,N/A,N/A,sets minute value(00-59)
+timeStamp,dateTime,N/A,N/A,sets time stamp value (yyyymmddhhmm)
+textSummary,"dateTime, regionalNormals, forecast, cloudPrecip, abbreviatedForecast, temperatures, precipitation, winds, comfort",N/A,N/A,"a general text string used to describe information on its parent tag (eg. Thursday November 02, 2006 at 18:01 UTC)"
+location,siteData,"continent, country, province, name, region",N/A,describes location of data through its children's tags
+continent,location,N/A,N/A,text string that describes the continent of the data
+country,location,N/A,code,text string that describes the country of the data
+province,location,N/A,code,text string that describes the province of the data
+name,location,N/A,code,text string that describes the site of the data
+region,location,N/A,N/A,text string that describes the region of the data
+warnings,siteData,event,URL,indicates that a warnings or watches are occurring
+event,warnings,dateTime,"type, priority, description",describes what type of warning or watches are occurring
+currentConditions,siteData,"station, dateTime, condition, iconCode, temperature, dewpoint, pressure, visibility, relativeHumidity, wind",N/A,sets current conditions through its children's tags
+station,currentConditions,N/A,"code,lat,lon",text string describing station (eg. Yellowknife Airport)
+condition,"currentConditions,hourlyForecast",textSummary,iconCode,text string describing weather conditions (eg. Mainly Cloudy)
+iconCode,"currentConditions, abbreviatedForecast, hourlyForecast",N/A,format,text string setting the icon code (eg. 01)
+temperature,"currentConditions, regionalNormals, temperatures, yesterdayConditions, almanac, hourlyForecast",N/A,"unitType, units, class, period, year",text string describing temperature (eg. -10.5)
+dewpoint,currentConditions,N/A,"unitType, units",text string describing dewpoint temperature (eg. -11.5)
+pressure,currentConditions,N/A,"unitType, units, change, tendency",text string describing pressure (eg. 103.2)
+visibility,currentConditions,N/A,"unitType, units",text string describing visibility (eg. 24.1)
+relativeHumidity,"currentConditions, forecast",N/A,units,text string describing relative humidity (eg. 93) 
+wind,"currentConditions, winds, hourlyForecast","speed, gust, direction, bearing","index, rank",sets wind value through its children's tags
+speed,wind,N/A,"unitType, units",text string setting wind speed (eg. 4)
+gust,wind,N/A,"unitType, units",text string setting wind gusts speed (eg. 25)
+direction,wind,N/A,"units,windDirFull",text string setting wind direction to the 16 points of the compass (eg. NNE)
+bearing,wind,N/A,units,text string setting wind bearing direction (eg. 30)
+forecastGroup,siteData,"dateTime, regionalNormals, forecast",N/A,sets all forecast information through its children's tags
+regionalNormals,forecastGroup,"textSummary, Temperature",N/A,sets regional normal information through its children's tags
+forecast,forecastGroup,"period, textSummary, cloudPrecip, abbreviatedForecast, temperatures, winds, precipitation, relativeHumidity, comfort",N/A,sets forecast conditions through its children's tags
+period,,N/A,textForecastName,text string that sets the forecast period (eg. Thursday)
+cloudPrecip,forecast,textSummary,N/A,sets weather conditions through its child tag
+abbreviatedForecast,forecast,"iconCode, pop, textSummary",N/A,sets abbreviatedForecast through its child tags
+pop,"abbreviatedForecast, almanac",N/A,units,text string that sets the probability of precipitation for the forecast period (eg. 60)
+temperatures,forecast,"textSummary, Temperature",N/A,sets forecast period temperature values through its child tags
+winds,forecast,"textSummary, wind",N/A,sets forecast period wind values through its child tags
+precipitation,"forecast, almanac","textSummary, precipType","class, period, unitType, year",sets forecast period precipitation information through its child tags or will provide precipitation amount (eg. 11.70)
+precipType,precipitation,N/A,"start, end",text string that shows precipitation type (eg. snow)
+yesterdayConditions,siteData,"temperature, precip",N/A,sets previous days weather conditions through its child tags
+precip,yesterdayConditions,,"unitType, units",text string that shows the amount of precipitation that has fallen (eg. 0.2)
+riseSet,siteData,"dateTime, disclaimer",N/A,"the sunrise, sunset, moonrise and moonset information will be provided through its child tags"
+almanac,siteData,"temperature, precipitation, pop",N/A,Provides climatic extreme data through its child tags
+license,siteData,N/A,N/A,text string that provides abbreviated license information as well as a URL.to the full license
+disclaimer,riseSet,N/A,N/A,a text string that provides additional information on the parent tag
+comfort,forecast,textSummary,N/A,text string that provides the comfort rating (eg. Cold)
+hourlyForecastGroup,siteData,hourlyForecast,N/A,"sets all hourly forecast information through its children's tags"
+hourlyForecast,hourlyForecastGroup,"condition,iconCode,temperature,lop,windChill,humidex,wind",dateTimeUTC,"sets all hourly forecast information through its children's tags"
+lop,hourlyForecast,N/A,"category,units","text string describing Likelihood of Precipitation (LOP)"
+windChill,"hourlyForecast,forecast,currentConditions","textSummary,calculated",unitType,"text string describing windChill"
+humidex,hourlyForecast,"textSummary,calculated",unitType,"text string describing humidex"

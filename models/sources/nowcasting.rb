@@ -8,9 +8,11 @@ class Nowcasting
 
 
     def self.refreshData()
-        urlBase=Nowcasting::DATA_LOCATION
-        fileURL=`lynx --dump '#{urlBase}' | tail -n 1 | cut -d ' ' -f 4`.chomp
-        `curl -s #{fileURL} | gzip -dc > #{Nowcasting::FILE_LOCATION}`
+        if $devOffLine.nil? or $devOffLine == false
+            urlBase=Nowcasting::DATA_LOCATION
+            fileURL=`lynx --dump '#{urlBase}' | tail -n 1 | cut -d ' ' -f 4`.chomp
+            `curl -s #{fileURL} | gzip -dc > #{Nowcasting::FILE_LOCATION}`
+        end
     end
 
 

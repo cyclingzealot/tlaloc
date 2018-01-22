@@ -72,7 +72,6 @@ puts DateTime.now.rfc2822 if twitter
 #    reason = "file does not exist"
 #end
 
-# RENDU ICI:  We need to figure out how to refresh the data location at time of call back.
 # Fetch data if necessary
 #if refreshECdata
 #    puts "Refreshing cache because #{reason}" if ($debug or twitter)
@@ -132,16 +131,18 @@ puts data.split("\n").count if $debug
 #    sunset = sunsetStr.split(' ').last.strip
 #end
 
-# RENDU ICI: we need to get the lat long => timezone to work
 sunset = location.sunset
 
 
 ### Process data into forecasts objects ##############################
+### RENDU ICI REARCH
 
-# Keep 7th line of data (12th line of output) until the time is 2 AM Zulu
+# Take 7th line of data (12th line of output) for the line representing
+# current observation
 currentLine=data.split("\n")[11]
 
 # REARCH TODO: change this into creator for a NowcastEntry or NowcastLine?
+# Not sure about rearch, comme back to it later
 current = Forecast.new(currentLine)
 
 forecastStrings=data.split("\n")

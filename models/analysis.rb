@@ -6,6 +6,11 @@ class Analysis
     @temperatureMax
     @currentForecast
     @popMax
+    @allNowcasts
+
+    def initialize(forecasts)
+        
+    end
 
 
 

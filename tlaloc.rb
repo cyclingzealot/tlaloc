@@ -157,6 +157,12 @@ forecasts = forecastStrings[11..forecastStrings.size-1].map { |l|
 ### Calculate worst cases ############################################
 
 # REARCH TODO: This will be an anlysis
+# Yes, but what abot later when we will get data from cityweather?
+# City weather shows a forecast, and nowcast shows a forecast
+# What is a forecast?  A collection of weather predictions at different times?
+# Yes, so is the nowcast.  A collection of weather predictions at different times.
+# Feeding an analysis different sources that each have a collection of predictions 
+# gives us the publication we want
 maxPop=forecasts.max_by {|f|
     f.pop
 }.pop

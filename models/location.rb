@@ -24,12 +24,20 @@ class Location
         @timezone = Timezone::Zone.new(:latlong => [@latitude, @longitude])
     end
 
+    def getCode
+        @code
+    end
+
+    def getName
+        @name
+    end
+
     def self.searchCity(city)
-        cities = Location.createCities(city, TRUE)
+        cities = Location.createLocations(city, true)
 
         puts "You may enter:" if cities.count > 0
-        cities.each {|c|
-            puts "#{c.code} for #{c.name}"
+        cities.each {|code,loc|
+            puts "#{code} for #{loc.getName}"
         }
     end
 

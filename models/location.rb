@@ -59,7 +59,11 @@ class Location
     end
 
     def self.refreshData(dataLocation, fileLocation)
-        `lynx --dump #{dataLocation} > #{fileLocation}`
+        if $devOffLine == true
+            `cp $PWD/dataSamples/dd.weather.gc.ca/nowcasting/doc/README_INCS-SIPI.txt #{fileLocation}`
+        else
+            `lynx --dump #{dataLocation} > #{fileLocation}`
+        end
     end
 
     def getCoordinates

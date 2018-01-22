@@ -13,6 +13,10 @@ $cacheConf = { 'sunset' => {
 }
 }
 
+$devOffLine = true
+if $devOffLine and `lynx --dump 'http://www.google.ca' 2>&1`.include?("Unable to connect")
+    $cacheConf['matrixList']['fileLocation'] = 
+
 $cacheStore        = "/tmp/tlaloc/"
 
 $debug              = true

@@ -3,7 +3,8 @@ require 'twitter'
 require 'active_support/time'
 
 
-class Forecast
+class Forecast 
+# Should be called Prediction?
 
     @temp = nil
     @wind = nil
@@ -11,8 +12,9 @@ class Forecast
     @pop     = nil
     @dateTime = nil
     @zone = nil
+    @location = nil
 
-    def initialize(line)
+    def initialize(line, location)
         @zone = ActiveSupport::TimeZone.new("Eastern Time (US & Canada)")
     # From the 7th line (current), record the temperature (14th column T) and precipiration (5th column)
     # See http://dd.weather.gc.ca/nowcasting/doc/README_nowcasting_prevision-immediate.txt
@@ -25,6 +27,8 @@ class Forecast
         @dateTime = DateTime.strptime("#{dateTimeStr} +0000", "%Y%m%d %H%M %z")
 
         @pcpType = 'none' if @pcpType.nil? or @pcpType.empty?
+
+        @location = location
 
 
         ## Lets find the maximum POP of all 3 POP types

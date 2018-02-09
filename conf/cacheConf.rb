@@ -14,7 +14,7 @@ $cacheConf = { 'sunset' => {
 }
 
 $devOffLine = true
-if $devOffLine and `lynx --dump 'http://www.google.ca' 2>&1`.include?("Unable to connect")
+if $devOffLine #and `lynx --dump 'http://www.google.ca' 2>&1`.include?("Unable to connect")
     $cacheConf['matrixList']['fileLocation'] = `echo $PWD`.chomp + '/dataSamples/dd.weather.gc.ca/nowcasting/matrices/SCRIBE.NWCSTG.01.20.13Z.n'
 end
 

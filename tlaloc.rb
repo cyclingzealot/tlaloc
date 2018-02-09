@@ -52,36 +52,6 @@ puts DateTime.now.rfc2822 if twitter
 ### Get data #########################################################
 
 
-### Determine date time of last refresh
-#
-#minuteOfCache = 27
-#dataLocation = '/tmp/tlaloc.ecData.txt'
-#minLines = 21120 * 0.9
-#n = DateTime.now
-#refreshECdata = false
-#reason = ''
-#if fileOK(dataLocation, minLines)
-#    lastRefreshWasAt = File.stat(dataLocation).mtime
-#    lastRefreshShouldBeAt = DateTime.new(n.year, n.month, n.day, n.hour, minuteOfCache, 0, (lastRefreshWasAt.utc_offset/60/60).to_s)
-#    lastRefreshShouldBeAt -= 1.0/24 if lastRefreshShouldBeAt > n
-#    lastRefreshShouldBeAt -= 1.0/60/24
-#    refreshECdata = lastRefreshWasAt < lastRefreshShouldBeAt
-#    reason = "cache dated #{lastRefreshWasAt.rfc2822} is #{refreshECdata ? 'before' : 'after'} #{lastRefreshShouldBeAt.rfc2822}"
-#else
-#    refreshECdata = true
-#    reason = "file does not exist"
-#end
-
-# Fetch data if necessary
-#if refreshECdata
-#    puts "Refreshing cache because #{reason}" if ($debug or twitter)
-#    urlBase='http://dd.weather.gc.ca/nowcasting/matrices/?C=M;O=A'
-#    fileURL=`lynx --dump '#{urlBase}' | tail -n 1 | cut -d ' ' -f 4`.chomp
-#    `curl -s #{fileURL} | gzip -dc > #{dataLocation}`
-#else
-#    puts "Not refreshing cache because #{reason}" if ($debug or twitter)
-#end
-
 #### Now get the data for your cityCode
 data = Nowcasting.getDataForCity(cityCode)
 location = nil
@@ -105,34 +75,7 @@ puts data.split("\n").count if $debug
 
 ### Get sunset times #################################################
 
-
-## Get sunset at
-## http://www.cmpsolv.com/cgi-bin/sunset?loc=YOW
-
-## Eventually this should be replaced by scanning http://dd.weather.gc.ca/nowcasting/doc/README_nowcasting_prevision-immediate.txt
-## and use https://github.com/joeyates/ruby-sun-times to calculate
-
-# First store the file if it's a new day
-#sunsetLocationCache = "/tmp/tlaloc.sunset.#{city}.html"
-#minLines = 60*0.9
-#if ! fileOK(sunsetLocationCache, minLines) or File.stat(sunsetLocationCache).mtime < DateTime.now.beginning_of_day()
-#    puts "Refreshing sunset times for #{city}" if ($debug or twitter)
-#    `curl -s http://www.cmpsolv.com/cgi-bin/sunset?loc=#{city} > #{sunsetLocationCache}`
-#else
-#    puts "Not refereshing sunset times for #{city}" if ($debug or twitter)
-#end
-#
-## Get the sunset time from the cached file
-#sunsetStr=`cat #{sunsetLocationCache} | grep 'Sunset:'`.strip
-#sunset = 'n/a'
-#if sunsetStr.split(' ').last.nil?
-#    puts $stderr.puts "No sunset data for #{city}" if $debug
-#else
-#    sunset = sunsetStr.split(' ').last.strip
-#end
-
 sunset = location.sunset
-
 
 ### Process data into forecasts objects ##############################
 ### RENDU ICI REARCH
@@ -141,15 +84,13 @@ sunset = location.sunset
 # current observation
 currentLine=data.split("\n")[11]
 
-# REARCH TODO: change this into creator for a NowcastEntry or NowcastLine?
-# Not sure about rearch, comme back to it later
-current = Forecast.new(currentLine)
+current = Forecast.new(currentLine, location)
 
 forecastStrings=data.split("\n")
 
 forecasts = forecastStrings[11..forecastStrings.size-1].map { |l|
     next if l[0] == '-'
-    Forecast.new(l)
+    Forecast.new(l, location)
 }.compact
 
 
@@ -163,6 +104,10 @@ forecasts = forecastStrings[11..forecastStrings.size-1].map { |l|
 # Yes, so is the nowcast.  A collection of weather predictions at different times.
 # Feeding an analysis different sources that each have a collection of predictions 
 # gives us the publication we want
+# A Forecast object has a location and a data.
+# The processing of the data could be a static mehod done by the class
+# It transform it into predictions, which is then taken by 
+
 maxPop=forecasts.max_by {|f|
     f.pop
 }.pop

@@ -4,7 +4,7 @@ require 'byebug'
 require 'getoptlong'
 
 
-require_relative './models/forecast.rb'
+require_relative './models/prediction.rb'
 require_relative './cache.rb'
 require_relative './models/location.rb'
 require_relative './models/sources/nowcasting.rb'
@@ -77,22 +77,11 @@ puts data.split("\n").count if $debug
 
 sunset = location.sunset
 
-### Process data into forecasts objects ##############################
-### RENDU ICI REARCH
+### Process data into prediction objects ##############################
 
-# Take 7th line of data (12th line of output) for the line representing
-# current observation
-currentLine=data.split("\n")[11]
-
-current = Forecast.new(currentLine, location)
-
-forecastStrings=data.split("\n")
-
-forecasts = forecastStrings[11..forecastStrings.size-1].map { |l|
-    next if l[0] == '-'
-    Forecast.new(l, location)
-}.compact
-
+# REARCH TODO: The initializer for Prediction still needs some work.
+# The logic for parsing nowcasting data must be taken out of Prediction constructor
+current, forecasts = Nowcasting::createPredictions(data, location)
 
 
 ### Calculate worst cases ############################################

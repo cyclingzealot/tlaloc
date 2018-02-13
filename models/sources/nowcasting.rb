@@ -69,6 +69,8 @@ class Nowcasting
             #parts[8].strip.to_i,
             parts[9].strip.to_i,
         ].max
+
+        return p
         
     end
 end

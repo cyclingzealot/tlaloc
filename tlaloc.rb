@@ -97,24 +97,27 @@ current, forecasts = Nowcasting::createPredictions(data, location)
 # The processing of the data could be a static mehod done by the class
 # It transform it into predictions, which is then taken by 
 
-maxPop=forecasts.max_by {|f|
-    f.pop
-}.pop
+a = Analysis.new(current, forecasts)
 
-minWindChill=forecasts.min_by {|f| f.windChill}.windChill
+#maxPop=forecasts.max_by {|f|
+#    f.pop
+#}.pop
 
-minTempFc=forecasts.min_by {|f| f.temp}
-minTemp = minTempFc.temp
-maxTempFc = forecasts.max_by {|f| f.temp}
-maxTemp = maxTempFc.temp
+#minWindChill=forecasts.min_by {|f| f.windChill}.windChill
 
-isThereWindChill = current.windChill? || minTempFc.windChill?
+#minTempFc=forecasts.min_by {|f| f.temp}
+#minTemp = minTempFc.temp
+#maxTempFc = forecasts.max_by {|f| f.temp}
+#maxTemp = maxTempFc.temp
 
-untilDateTime=(forecasts.max_by {|f| f.dateTime}.dateTime) + 1*60*60
-untilHour=untilDateTime.hour
+#untilDateTime=(forecasts.max_by {|f| f.dateTime}.dateTime) + 1*60*60
+#untilHour=untilDateTime.hour
 
-worstTempOrChill = minWindChill
-worstTempOrChill = maxTemp if minWindChill >= 20
+#worstTempOrChill = minWindChill
+#worstTempOrChill = maxTemp if minWindChill >= 20
+
+
+### REARCH: Rendu ici.  Now we need to make a channel process an analysis to be published
 
 
 

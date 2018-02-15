@@ -17,6 +17,7 @@ class Prediction
     attr_accessor :pcpType
     attr_accessor :pop
     attr_accessor :dateTime
+    attr_accessor :location
 
 
 	########################################################################

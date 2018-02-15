@@ -12,9 +12,16 @@ class Analysis
     
     attr_reader :untilDateTime
 
-    def initialize(currentPrediction, futurePredictions, location)
+    def initialize(currentPrediction, futurePredictions)
+        # Doublecheck location of predictions against currentPrediction
+        raise "Not all predictions from same location" if ! futurePredictions.all? { |p|
+            p.location == currentPrediction.location
+        } 
+
         @currentPrediction = currentPrediction
         @futurePredictions = futurePredictions
+
+        self.calcWorstCases()
     end
 
     def calcWorstCases()
@@ -39,6 +46,32 @@ class Analysis
         return @windChillMin
     end
 
+    def to_s
+        windChillLabel = @windChillMin < 10 ? 'Windchill' : 'Temperature'
+        bodyStr="Current/Worst: #{windChillLabel}: #{@currentPrediction.windChill()}/#{@windChillMin}, POP: #{@currentPrediction.pcpType}/#{@popMax}; Sunset: #{self.sunset()}\n"
 
+        # Get the POP for each prediction (including the current one) and develop it into a string
+        popStr=''
+        i=0
+        ([@currentPrediction] + @futurePredictions).each { |f|
+            if f.pop >= 30
+                i += 1
+                if i==1
+                    popStr += "POP: #{f.hour}:00: #{f.pop}%; "
+                else
+                    popStr += "#{f.hour}: #{f.pop}; "
+                end
+            end
+        }
+
+        windStr = ''
+        windTimes = ''
+
+        (bodyStr.chomp + "\n" + popStr.chomp).chomp
+    end
+
+    def sunset
+        @currentPrediction.location.sunset
+    end
 
 end

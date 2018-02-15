@@ -6,6 +6,7 @@ require 'getoptlong'
 
 require_relative './models/prediction.rb'
 require_relative './cache.rb'
+require_relative './models/analysis.rb'
 require_relative './models/location.rb'
 require_relative './models/sources/nowcasting.rb'
 
@@ -117,37 +118,41 @@ a = Analysis.new(current, forecasts)
 #worstTempOrChill = maxTemp if minWindChill >= 20
 
 
-### REARCH: Rendu ici.  Now we need to make a channel process an analysis to be published
 
 
 
 ### Decide on string #################################################
 
 
-# REARCH: This would be an analysis interacting with a channel?
 
-windChillLabel = worstTempOrChill < 10 ? 'Windchill' : 'Temperature'
+#REARCH: This has been put in Analysis.to_s . 
+#windChillLabel = worstTempOrChill < 10 ? 'Windchill' : 'Temperature'
+#bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{worstTempOrChill}, POP: #{current.pcpType}/#{maxPop}; Sunset: #{sunset}\n"
 
-bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{worstTempOrChill}, POP: #{current.pcpType}/#{maxPop}; Sunset: #{sunset}\n"
 
-
+#REARCH: Rendu ici
+#REARCH: Put this in Analysis.to_s too
 # POP string
-popStr=''
-i=0
-forecasts.each { |f|
-    if f.pop >= 30
-        i += 1
-        if i==1
-            popStr += "POP: #{f.hour}:00: #{f.pop}%; "
-        else
-            popStr += "#{f.hour}: #{f.pop}; "
-        end
-    end
-}
-
-windStr = ''
-windTimes = ''
-finalStr = bodyStr
+#popStr=''
+#i=0
+#forecasts.each { |f|
+#    if f.pop >= 30
+#        i += 1
+#        if i==1
+#            popStr += "POP: #{f.hour}:00: #{f.pop}%; "
+#        else
+#            popStr += "#{f.hour}: #{f.pop}; "
+#        end
+#    end
+#}
+#
+#windStr = ''
+#windTimes = ''
+#finalStr = bodyStr
+#
+#REARCH: Now lets test it
+byebug
+puts a.to_s
 
 
 ### Decide on string if twitter ######################################

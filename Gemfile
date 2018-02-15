@@ -4,4 +4,4 @@ gem 'timezone'
 gem 'nokogiri'
 #gem 'open-uri'
 #gem 'getoptlong'
-
+gem 'abstract_class'

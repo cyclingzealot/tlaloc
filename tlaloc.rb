@@ -9,7 +9,8 @@ require_relative './cache.rb'
 require_relative './models/analysis.rb'
 require_relative './models/location.rb'
 require_relative './models/sources/nowcasting.rb'
-
+require_relative './models/channels/twitter.rb'
+require_relative './models/channels/cli.rb'
 
 def fileOK(path, minLines)
     return ((File.exists?(path)) and (`wc -l "#{path}"`.strip.split(' ')[0].to_i > minLines))
@@ -73,161 +74,87 @@ puts "Data on data:" if $debug
 puts data if ($debug or twitter)
 puts data.split("\n").count if $debug
 
-
 ### Get sunset times #################################################
 
 sunset = location.sunset
 
 ### Process data into prediction objects ##############################
 
-# REARCH TODO: The initializer for Prediction still needs some work.
-# The logic for parsing nowcasting data must be taken out of Prediction constructor
 current, forecasts = Nowcasting::createPredictions(data, location)
 
-
-### Calculate worst cases ############################################
-
-# REARCH TODO: This will be an anlysis
-# Yes, but what abot later when we will get data from cityweather?
-# City weather shows a forecast, and nowcast shows a forecast
-# What is a forecast?  A collection of weather predictions at different times?
-# Yes, so is the nowcast.  A collection of weather predictions at different times.
-# Feeding an analysis different sources that each have a collection of predictions 
-# gives us the publication we want
-# A Forecast object has a location and a data.
-# The processing of the data could be a static mehod done by the class
-# It transform it into predictions, which is then taken by 
+### Calculate worst cases by feeding to an analysis #################
 
 a = Analysis.new(current, forecasts)
-
-#maxPop=forecasts.max_by {|f|
-#    f.pop
-#}.pop
-
-#minWindChill=forecasts.min_by {|f| f.windChill}.windChill
-
-#minTempFc=forecasts.min_by {|f| f.temp}
-#minTemp = minTempFc.temp
-#maxTempFc = forecasts.max_by {|f| f.temp}
-#maxTemp = maxTempFc.temp
-
-#untilDateTime=(forecasts.max_by {|f| f.dateTime}.dateTime) + 1*60*60
-#untilHour=untilDateTime.hour
-
-#worstTempOrChill = minWindChill
-#worstTempOrChill = maxTemp if minWindChill >= 20
-
-
-
-
-
-### Decide on string #################################################
-
-
-
-#REARCH: This has been put in Analysis.to_s . 
-#windChillLabel = worstTempOrChill < 10 ? 'Windchill' : 'Temperature'
-#bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{worstTempOrChill}, POP: #{current.pcpType}/#{maxPop}; Sunset: #{sunset}\n"
-
-
-#REARCH: Rendu ici
-#REARCH: Put this in Analysis.to_s too
-# POP string
-#popStr=''
-#i=0
-#forecasts.each { |f|
-#    if f.pop >= 30
-#        i += 1
-#        if i==1
-#            popStr += "POP: #{f.hour}:00: #{f.pop}%; "
-#        else
-#            popStr += "#{f.hour}: #{f.pop}; "
-#        end
-#    end
-#}
-#
-#windStr = ''
-#windTimes = ''
-#finalStr = bodyStr
-#
-#REARCH: Now lets test it
-byebug
-puts a.to_s
-
 
 ### Decide on string if twitter ######################################
 
 # REARCH: This logic would all go in the twitter channel, most likely
 
 
-i=0
+channel = CliChannel.new(a)
 if twitter
-    if $clientConf[cityCode].nil?
-        $stderr.puts "No configuration for city #{cityCode}, can't announce"
-        exit 1
-    end
-
-    weatherHashTag  = $clientConf[cityCode]['weatherHashTag']
-    bikeHashTag     = $clientConf[cityCode]['bikeHashTag']
-
-    twitterMaxChars = 140
-    finalStr = '#' * (twitterMaxChars + 10)
-    attempt=0
-
-    while(finalStr.length >= 140)
-        puts "#{finalStr.length} chars: #{finalStr}" if $debug
-        attempt+=1
-
-        case attempt
-        when 1
-            announceStr = "Your #{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%k:%M').strip}: "
-        when 2
-            announceStr = "#{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%k:%M').strip}: "
-        when 3
-            announceStr = "#{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%l%P').strip}: "
-        when 4
-            popStr.strip!
-            popStr.gsub!(/;$/, '')
-        when 5
-            windTimes = ''
-        when 6
-            windStr = ''
-        when 10
-	        popStr=''
-		    forecasts.each { |f|
-                finalStr = announceStr + bodyStr + windStr + popStr + windTimes
-	            strLength = finalStr.length
-			    if f.pop >= 30
-			        i += 1
-			        if i==1
-			            popStr += "POP > 30% @ #{f.hour}:00"
-			        elsif strLength < twitterMaxChars - 5
-			            popStr += ", #{f.hour}"
-	                else
-	                    popStr += '+'
-	                    break
-			        end
-		        end
-	        }
-        when 20
-            windChillLabel = minTemp < 10 ? 'Wc' : 'T'
-	        bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}\n"
-        when 100
-            finalStr = finalStr[0,twitterMaxChars-1]
-        end
-
-
-        finalStr = announceStr + bodyStr + windStr + popStr + windTimes
-
-    end
-
-else
-    finalStr = bodyStr + windStr + popStr + windTimes
+    channel = TwitterChannel.new(a)
+#    if $clientConf[cityCode].nil?
+#        $stderr.puts "No configuration for city #{cityCode}, can't announce"
+#        exit 1
+#    end
+#
+#    weatherHashTag  = $clientConf[cityCode]['weatherHashTag']
+#    bikeHashTag     = $clientConf[cityCode]['bikeHashTag']
+#
+#    twitterMaxChars = 140
+#    finalStr = '#' * (twitterMaxChars + 10)
+#    attempt=0
+#
+#    while(finalStr.length >= 140)
+#        puts "#{finalStr.length} chars: #{finalStr}" if $debug
+#        attempt+=1
+#
+#        case attempt
+#        when 1
+#            announceStr = "Your #{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%k:%M').strip}: "
+#        when 2
+#            announceStr = "#{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%k:%M').strip}: "
+#        when 3
+#            announceStr = "#{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%l%P').strip}: "
+#        when 4
+#            popStr.strip!
+#            popStr.gsub!(/;$/, '')
+#        when 5
+#            windTimes = ''
+#        when 6
+#            windStr = ''
+#        when 10
+#	        popStr=''
+#		    forecasts.each { |f|
+#                finalStr = announceStr + bodyStr + windStr + popStr + windTimes
+#	            strLength = finalStr.length
+#			    if f.pop >= 30
+#			        i += 1
+#			        if i==1
+#			            popStr += "POP > 30% @ #{f.hour}:00"
+#			        elsif strLength < twitterMaxChars - 5
+#			            popStr += ", #{f.hour}"
+#	                else
+#	                    popStr += '+'
+#	                    break
+#			        end
+#		        end
+#	        }
+#        when 20
+#            windChillLabel = minTemp < 10 ? 'Wc' : 'T'
+#	        bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}\n"
+#        when 100
+#            finalStr = finalStr[0,twitterMaxChars-1]
+#        end
+#
+#
+#        finalStr = announceStr + bodyStr + windStr + popStr + windTimes
+#
+#    end
+#
 end
 
-
-
-finalStr.strip!
 
 
 ### Ouput / publish ##################################################
@@ -235,32 +162,6 @@ finalStr.strip!
 
 # REARCH: Goes in channel or broadcast class
 
-unless twitter
-    puts finalStr
-else
-	client = Twitter::REST::Client.new($clientConf[cityCode])
+puts a.to_s if $debug and not twitter
 
-	if client
-	   puts "Client ready"
-       unless $debug
-         r = client.update(finalStr)
-
-         if ! r.nil?
-            puts "Announced!"
-            puts r.url
-         else
-            puts "Annouced failed"
-         end
-      else
-         puts "$debug on, not announcing"
-      end
-      puts finalStr
-	else
-	    $stderr.puts "Client error"
-	    exit 1
-	end
-
-    puts "String length is #{finalStr.length}"
-end
-
-
+channel.publish

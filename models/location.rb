@@ -5,11 +5,11 @@ require 'timezone'
 
 
 class Location
-    @latitude
-    @longitude
-    @code
-    @name
-    @timezone
+    attr_reader :latitude
+    attr_reader :longitude
+    attr_reader :code
+    attr_reader :name
+    attr_reader :timezone
 
     DATA_LOCATION = $cacheConf['cityList']['dataLocation']
 

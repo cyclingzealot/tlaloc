@@ -24,6 +24,19 @@ class Location
         @timezone = Timezone::Zone.new(:latlong => [@latitude, @longitude])
     end
 
+    def self.configureTimeZoneLookup
+        require_relative '../conf/timezoneGoogleApiConf.rb'
+        Timezone::Lookup.config(:google) do |c|
+            c.api_key = $googleAPIkey
+        end
+    end
+
+    def self.testTimeZoneLookup
+        Timezone.lookup(-34.92771808058, 138.477041423321).name == "Australia/Adelaide"
+    end
+
+    
+
     def getCode
         @code
     end

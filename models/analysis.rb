@@ -71,7 +71,8 @@ class Analysis
     end
 
     def sunset
-        @currentPrediction.location.sunset
+        where = @currentPrediction.location
+        where.sunset.change(where.timezone)
     end
 
 end

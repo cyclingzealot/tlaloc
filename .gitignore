@@ -7,3 +7,4 @@ twitterConfig.rb
 .project
 vendor/
 .bundle
+timezoneGoogleApiConf.rb

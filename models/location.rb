@@ -9,9 +9,13 @@ class Location
     attr_reader :longitude
     attr_reader :code
     attr_reader :name
-    attr_reader :timezone
 
+    # Path of local copy of EC location file
     DATA_LOCATION = $cacheConf['cityList']['dataLocation']
+
+    # CSV file that includes timezone data and hopefully will replace the above one day
+    CSV_LOCATION = File.expand_path('~/.tlaloc.locationData.tsv')
+    CSV_OPTIONS = {col_sep: "\t", row_sep: "\n", headers: true, encoding: "UTF-8", header_converters: :symbol}
 
 
     def initialize(code, name, lat, long, skipTZ = FALSE)
@@ -21,29 +25,130 @@ class Location
         @longitude = long.to_f
 
 
-        @timezone = Timezone::Zone.new(:latlong => [@latitude, @longitude])
     end
 
-    def self.configureTimeZoneLookup
-        require_relative '../conf/timezoneGoogleApiConf.rb'
-        Timezone::Lookup.config(:google) do |c|
-            c.api_key = $googleAPIkey
+    def timezone()
+        begin
+            @timezone or @timezone = Timezone.lookup(@latitude, @longitude)
+        rescue Timezone::Error::InvalidZone
+            puts "Invalid zone for #{self.to_s}"
+            raise
         end
     end
 
+    ########################################################################
+    # Generate a string that contains all the timezone data per city code
+    ########################################################################
+    def self.updateTimeZoneData(seperator = "\t")
+        Location::configureTimeZoneLookup()
+        locations = Location::createLocations('')
+        existingLocations = Location::readLocationData()
+        str = ''
+        i=0
+        locations.each { |locationCode, locObj |
+            i += 1
+            next if locObj.latitude == 0.0 
+
+            # Check if we genuinely have a location object
+            if locObj.nil? 
+                $stderr.puts "Nil location object for #{locationCode}"
+                puts
+                next
+            end
+
+            if not existingLocations[locObj.code].nil?
+                puts "Already have:\t#{locObj.to_s}"
+                next
+            end
+
+
+            print "#{i} / #{locations.count}: #{locObj.to_s} "
+            print "Fetching... "
+
+            begin
+                str += (locationCode + seperator + locObj.timezone.name).chomp + "\n"
+            rescue Timezone::Error::InvalidZone
+                sleep 1
+                next
+            end
+
+            print "Obtained... "
+            self.appendLocationData(locObj)
+            puts "Saved."
+            sleep 1
+        }
+
+        return str
+    end
+
+    def to_s
+        "#{@code}: #{@name} (#{@latitude}; #{@longitude})"
+    end
+
+    def self.readLocationData()
+        require 'csv'
+        returnHash = {}
+        if File.file?(Location::CSV_LOCATION)
+            CSV.foreach(Location::CSV_LOCATION, Location::CSV_OPTIONS) do |row|
+                rowHash = row.to_hash
+                returnHash[rowHash[:code]] = rowHash
+            end
+        end
+        return returnHash
+    end
+
+    def self.appendLocationData(locObj)
+        require 'csv'
+
+        # If the file does not exist, create it with headers
+        if not File.file?(Location::CSV_LOCATION)
+            CSV.open(Location::CSV_LOCATION, "w", Location::CSV_OPTIONS) do |csv|
+                csv << ["code", "timezoneName", "latitude", "longitude"]
+            end
+        end
+
+        # Append the last bit of location data
+        CSV.open(Location::CSV_LOCATION, "a+", Location::CSV_OPTIONS) do |csv|
+            csv << [locObj.code, locObj.timezone.name, locObj.latitude, locObj.longitude]
+        end
+    end
+
+    ########################################################################
+    # Test if the timezone lookup has been configured. 
+    # If not, catches the error and returns false
+    ########################################################################
+    def self.timeZoneLookupReady?()
+        begin
+            Location::testTimeZoneLookup
+            # TODO: What if the above returns false?  Name of test time zone has changed.
+        rescue Timezone::Error::InvalidConfig
+            return false
+        end
+    end
+
+
+    ########################################################################
+    # Configures the time zone lookup IF not already set up
+    ########################################################################
+    def self.configureTimeZoneLookup
+        if not Location::timeZoneLookupReady?()
+            require_relative '../conf/timezoneGoogleApiConf.rb'
+            Timezone::Lookup.config(:google) do |c|
+                c.api_key = $googleAPIkey
+                c.open_timeout = 60
+                c.read_timeout = 60
+            end
+        end
+    end
+
+    ########################################################################
+    # Returns true if the location is working correctly
+    ########################################################################
     def self.testTimeZoneLookup
         Timezone.lookup(-34.92771808058, 138.477041423321).name == "Australia/Adelaide"
     end
 
     
-
-    def getCode
-        @code
-    end
-
-    def getName
-        @name
-    end
 
     def self.searchCity(city)
         cities = Location.createLocations(city, true)

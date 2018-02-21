@@ -17,6 +17,11 @@ class Location
     CSV_LOCATION = File.expand_path('~/.tlaloc.locationData.tsv')
     CSV_OPTIONS = {col_sep: "\t", row_sep: "\n", headers: true, encoding: "UTF-8", header_converters: :symbol}
 
+    CSV_HEADER_TZ = "timezonename"
+
+    # TODO: Find how to do a class, static variable for this (a variable that all locations can access and retains it's value)
+    $csvLocationData = nil
+
 
     def initialize(code, name, lat, long, skipTZ = FALSE)
         @code = code
@@ -29,15 +34,22 @@ class Location
 
     def timezone()
         begin
-            @timezone or @timezone = Timezone.lookup(@latitude, @longitude)
+            byebug
+            @timezone or @timezone = Timezone.new(Location::findTimeZone(@code)) #Timezone.lookup(@latitude, @longitude)
         rescue Timezone::Error::InvalidZone
             puts "Invalid zone for #{self.to_s}"
             raise
         end
     end
 
+    def self.findTimeZone(locationCode)
+        locationDataHash = Location::readLocationData
+        return locationDataHash[locationCode][Location::CSV_HEADER_TZ.to_sym]
+    end
+
     ########################################################################
     # Generate a string that contains all the timezone data per city code
+    # Also save that data to tsv file
     ########################################################################
     def self.updateTimeZoneData(seperator = "\t")
         Location::configureTimeZoneLookup()
@@ -88,12 +100,18 @@ class Location
     def self.readLocationData()
         require 'csv'
         returnHash = {}
-        if File.file?(Location::CSV_LOCATION)
-            CSV.foreach(Location::CSV_LOCATION, Location::CSV_OPTIONS) do |row|
-                rowHash = row.to_hash
-                returnHash[rowHash[:code]] = rowHash
-            end
+        if $csvLocationData.nil?
+	        if File.file?(Location::CSV_LOCATION)
+	            CSV.foreach(Location::CSV_LOCATION, Location::CSV_OPTIONS) do |row|
+	                rowHash = row.to_hash
+	                returnHash[rowHash[:code]] = rowHash
+	            end
+	        end
+            $csvLocationData = returnHash.clone
+        else
+            returnHash = $csvLocationData
         end
+
         return returnHash
     end
 
@@ -103,7 +121,7 @@ class Location
         # If the file does not exist, create it with headers
         if not File.file?(Location::CSV_LOCATION)
             CSV.open(Location::CSV_LOCATION, "w", Location::CSV_OPTIONS) do |csv|
-                csv << ["code", "timezoneName", "latitude", "longitude"]
+                csv << ["code", Location::CSV_HEADER_TZ, "latitude", "longitude"]
             end
         end
 

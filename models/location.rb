@@ -109,7 +109,7 @@ class Location
 
         # Append the last bit of location data
         CSV.open(Location::CSV_LOCATION, "a+", Location::CSV_OPTIONS) do |csv|
-            csv << [locObj.code, locObj.timezone.name, locObj.latitude, locObj.longitude]
+            csv << [locObj.code, locObj.timezone.name, locObj.latitude, locObj.longitude, locObj.name]
         end
     end
 

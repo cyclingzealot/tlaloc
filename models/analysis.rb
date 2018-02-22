@@ -48,7 +48,7 @@ class Analysis
 
     def to_s
         windChillLabel = @windChillMin < 10 ? 'Windchill' : 'Temperature'
-        bodyStr="Current/Worst: #{windChillLabel}: #{@currentPrediction.windChill()}/#{@windChillMin}, POP: #{@currentPrediction.pcpType}/#{@popMax}; Sunset: #{self.sunset()}\n"
+        bodyStr="Current/Worst: #{windChillLabel}: #{@currentPrediction.windChill()}/#{@windChillMin}, POP: #{@currentPrediction.pcpType}/#{@popMax}; Sunset: #{self.sunset().strftime("%H:%M")}\n"
 
         # Get the POP for each prediction (including the current one) and develop it into a string
         popStr=''
@@ -71,8 +71,9 @@ class Analysis
     end
 
     def sunset
+        require 'active_support/core_ext/time'
         where = @currentPrediction.location
-        where.sunset.change(where.timezone)
+        where.sunset.in_time_zone(where.timezone)
     end
 
 end

@@ -5,10 +5,10 @@ class TwitterChannel < Channel
 	attr_reader :cityCode
 
     def initialize(analysis)
-		@cityCode = @analysis.location.code
+		@cityCode = analysis.location.code
 	    if $clientConf[@cityCode].nil?
 	        msg = "No configuration for city #{@cityCode}, can't announce"
-			$strerr.puts msg
+			$stderr.puts msg
 	        raise msg 
 	    end
         super(analysis)
@@ -16,7 +16,7 @@ class TwitterChannel < Channel
 
     def publish()
         str = generateString
-        broadcast(str)
+        self.broadcast(str)
 	end
 
 
@@ -55,6 +55,14 @@ class TwitterChannel < Channel
 	    twitterMaxChars = 280
 	    finalStr = '#' * (twitterMaxChars + 10)
 	    attempt=0
+
+        untilDateTime = @analysis.untilDateTime
+
+        analysisToStringsArray = @analysis.to_s.split("\n")
+        bodyStr = analysisToStringsArray[0]
+        popStr = analysisToStringsArray[1] or ''
+        windStr = ''
+        windTimes = ''
 	
 	    while(finalStr.length >= twitterMaxChars)
 	        puts "#{finalStr.length} chars: #{finalStr}" if $debug
@@ -76,6 +84,7 @@ class TwitterChannel < Channel
 	            windStr = ''
 	        when 10
 		        popStr=''
+                forecasts = @analysis.allPredictions
 			    forecasts.each { |f|
 	                finalStr = announceStr + bodyStr + windStr + popStr + windTimes
 		            strLength = finalStr.length
@@ -98,8 +107,9 @@ class TwitterChannel < Channel
 	            finalStr = finalStr[0,twitterMaxChars-1]
 	        end
 	
-	
-	        finalStr = (announceStr + bodyStr + windStr + popStr + windTimes).strip
+	        finalStr = (announceStr.chomp + "\n" + bodyStr.chomp + "\n" + windStr + popStr + windTimes).strip
         end
+
+        return finalStr
     end
 end

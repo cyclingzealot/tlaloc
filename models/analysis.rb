@@ -24,6 +24,14 @@ class Analysis
         self.calcWorstCases()
     end
 
+    def allPredictions
+        [@currentPrediction] + [@futurePredictions]
+    end
+
+    def location
+        @currentPrediction.location
+    end
+
     def calcWorstCases()
 		@popMax=@futurePredictions.max_by {|f|
 		    f.pop   
@@ -69,6 +77,7 @@ class Analysis
 
         (bodyStr.chomp + "\n" + popStr.chomp).chomp
     end
+
 
     def sunset
         require 'active_support/core_ext/time'

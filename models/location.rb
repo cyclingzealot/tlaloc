@@ -34,7 +34,6 @@ class Location
 
     def timezone()
         begin
-            byebug
             @timezone or @timezone = Location::findTimeZone(@code) #Timezone.lookup(@latitude, @longitude)
         rescue Timezone::Error::InvalidZone
             puts "Invalid zone for #{self.to_s}"

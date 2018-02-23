@@ -26,7 +26,7 @@ opts = GetoptLong.new(
 )
 
 
-cityCode='YOW'
+cityCode='CYOW'
 twitter=false
 $debug=false
 
@@ -35,7 +35,7 @@ opts.each do |opt, arg|
     when '--city'
         cityCode=arg
     when '--twitter'
-        require_relative './twitterConfig.rb'
+        require_relative './conf/twitterConfig.rb'
         twitter=true
     when '--$debug'
         $debug=true
@@ -149,7 +149,7 @@ if twitter
 #        end
 #
 #
-#        finalStr = announceStr + bodyStr + windStr + popStr + windTimes
+#        finalStr = announceStr.chomp + "\n" + bodyStr.chomp + "\n" + windStr + popStr + windTimes
 #
 #    end
 #

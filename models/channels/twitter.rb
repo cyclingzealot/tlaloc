@@ -58,10 +58,12 @@ class TwitterChannel < Channel
 
         untilDateTime = @analysis.untilDateTime
 
+        byebug
         analysisToStringsArray = @analysis.to_s.split("\n")
         tmpStr = analysisToStringsArray[0]
         popSumStr = analysisToStringsArray[1] or ''
-        popStr = ''
+        popStr = analysisToStringsArray[2]
+        sunsetStr = analysisToStringsArray[3]
         windStr = ''
         windTimes = ''
 
@@ -72,10 +74,13 @@ class TwitterChannel < Channel
 	        case attempt
 	        when 1
 	            announceStr = "Your #{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%k:%M').strip} "
+                announceStr = announceStr.chomp + "(Current / Worst):"
 	        when 2
 	            announceStr = "#{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%k:%M').strip} "
+                announceStr = announceStr.chomp + "(Current / Worst):"
 	        when 3
 	            announceStr = "#{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%l%P').strip} "
+                announceStr = announceStr.chomp + "(Current / Worst):"
 	        when 4
 	            popStr.strip!
 	            popStr.gsub!(/;$/, '')
@@ -105,9 +110,7 @@ class TwitterChannel < Channel
 	            finalStr = finalStr[0,twitterMaxChars-1]
 	        end
 
-            announceStr = announceStr.chomp + "(Current / Worst):"
-
-	        finalStr = (announceStr.chomp + "\n" + tmpStr.chomp + "\n" + windStr + popSumStr + popStr + windTimes).strip
+	        finalStr = (announceStr.chomp + "\n" + tmpStr.chomp + "\n" + popSumStr + "\n" + sunsetStr.strip + "\n" + popStr.strip + "\n"  + windStr + windTimes).strip if attempt < 100
         end
 
         return finalStr

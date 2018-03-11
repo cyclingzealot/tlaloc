@@ -9,6 +9,7 @@ class Location
     attr_reader :longitude
     attr_reader :code
     attr_reader :name
+    attr_writer :timezone
 
     # Path of local copy of EC location file
     DATA_LOCATION = $cacheConf['cityList']['dataLocation']
@@ -34,7 +35,7 @@ class Location
 
     def timezone()
         begin
-            @timezone or @timezone = Location::findTimeZone(@code) #Timezone.lookup(@latitude, @longitude)
+            @timezone or @timezone = Location::findTimeZone(@code) or Timezone.lookup(@latitude, @longitude)
         rescue Timezone::Error::InvalidZone
             puts "Invalid zone for #{self.to_s}"
             raise
@@ -51,6 +52,11 @@ class Location
     # Also save that data to tsv file
     ########################################################################
     def self.updateTimeZoneData(seperator = "\t")
+        if not File.file?(Location::CSV_LOCATION)
+            require 'fileutils'
+            FileUtils.touch(Location::CSV_LOCATION)
+        end
+
         Location::configureTimeZoneLookup()
         locations = Location::createLocations('')
         existingLocations = Location::readLocationData()
@@ -58,10 +64,10 @@ class Location
         i=0
         locations.each { |locationCode, locObj |
             i += 1
-            next if locObj.latitude == 0.0 
+            next if locObj.latitude == 0.0
 
             # Check if we genuinely have a location object
-            if locObj.nil? 
+            if locObj.nil?
                 $stderr.puts "Nil location object for #{locationCode}"
                 puts
                 next
@@ -77,9 +83,11 @@ class Location
             print "Fetching... "
 
             begin
+                locObj.timezone = Timezone.lookup(locObj.latitude, locObj.longitude)
                 str += (locationCode + seperator + locObj.timezone.name).chomp + "\n"
             rescue Timezone::Error::InvalidZone
                 sleep 1
+                puts "Error.\n"
                 next
             end
 
@@ -99,12 +107,15 @@ class Location
     def self.readLocationData()
         require 'csv'
         returnHash = {}
-        if $csvLocationData.nil?
-	        if File.file?(Location::CSV_LOCATION)
+        if $csvLocationData.nil?   # This will be nil if we haven't read it already
+            if File.file?(Location::CSV_LOCATION)
 	            CSV.foreach(Location::CSV_LOCATION, Location::CSV_OPTIONS) do |row|
 	                rowHash = row.to_hash
 	                returnHash[rowHash[:code]] = rowHash
 	            end
+            else
+                byebug
+                raise "$csvLocationData nil but no file at #{Location::CSV_LOCATION} .  Maybe you need to run ruby ./updateLocationData.rb ?"
 	        end
             $csvLocationData = returnHash.clone
         else
@@ -131,7 +142,7 @@ class Location
     end
 
     ########################################################################
-    # Test if the timezone lookup has been configured. 
+    # Test if the timezone lookup has been configured.
     # If not, catches the error and returns false
     ########################################################################
     def self.timeZoneLookupReady?()
@@ -165,7 +176,7 @@ class Location
         Timezone.lookup(-34.92771808058, 138.477041423321).name == "Australia/Adelaide"
     end
 
-    
+
 
     def self.searchCity(city)
         cities = Location.createLocations(city, true)

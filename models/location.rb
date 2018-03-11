@@ -53,8 +53,7 @@ class Location
     ########################################################################
     def self.updateTimeZoneData(seperator = "\t")
         if not File.file?(Location::CSV_LOCATION)
-            require 'fileutils'
-            FileUtils.touch(Location::CSV_LOCATION)
+            Location::createLocationDataFile
         end
 
         Location::configureTimeZoneLookup()
@@ -86,6 +85,7 @@ class Location
                 locObj.timezone = Timezone.lookup(locObj.latitude, locObj.longitude)
                 str += (locationCode + seperator + locObj.timezone.name).chomp + "\n"
             rescue Timezone::Error::InvalidZone
+            rescue Timezone::Error::Google
                 sleep 1
                 puts "Error.\n"
                 next
@@ -114,7 +114,6 @@ class Location
 	                returnHash[rowHash[:code]] = rowHash
 	            end
             else
-                byebug
                 raise "$csvLocationData nil but no file at #{Location::CSV_LOCATION} .  Maybe you need to run ruby ./updateLocationData.rb ?"
 	        end
             $csvLocationData = returnHash.clone
@@ -125,14 +124,19 @@ class Location
         return returnHash
     end
 
+    def self.createLocationDataFile()
+            require 'csv'
+            CSV.open(Location::CSV_LOCATION, "w", Location::CSV_OPTIONS) do |csv|
+                csv << ["code", Location::CSV_HEADER_TZ, "latitude", "longitude"]
+            end
+    end
+
     def self.appendLocationData(locObj)
         require 'csv'
 
         # If the file does not exist, create it with headers
         if not File.file?(Location::CSV_LOCATION)
-            CSV.open(Location::CSV_LOCATION, "w", Location::CSV_OPTIONS) do |csv|
-                csv << ["code", Location::CSV_HEADER_TZ, "latitude", "longitude"]
-            end
+            Location::createLocationDataFile
         end
 
         # Append the last bit of location data

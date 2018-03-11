@@ -58,7 +58,6 @@ class TwitterChannel < Channel
 
         untilDateTime = @analysis.untilDateTime
 
-        byebug
         analysisToStringsArray = @analysis.to_s.split("\n")
         tmpStr = analysisToStringsArray[0]
         popSumStr = analysisToStringsArray[1] or ''

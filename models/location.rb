@@ -84,9 +84,11 @@ class Location
             begin
                 locObj.timezone = Timezone.lookup(locObj.latitude, locObj.longitude)
                 str += (locationCode + seperator + locObj.timezone.name).chomp + "\n"
-            rescue Timezone::Error::InvalidZone
-            rescue Timezone::Error::Google
                 sleep 1
+            rescue Timezone::Error::InvalidZone
+                puts "Error.\n"
+                next
+            rescue Timezone::Error::Google
                 puts "Error.\n"
                 next
             end

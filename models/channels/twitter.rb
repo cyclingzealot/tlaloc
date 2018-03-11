@@ -9,7 +9,7 @@ class TwitterChannel < Channel
 	    if $clientConf[@cityCode].nil?
 	        msg = "No configuration for city #{@cityCode}, can't announce"
 			$stderr.puts msg
-	        raise msg 
+	        raise msg
 	    end
         super(analysis)
     end
@@ -22,27 +22,27 @@ class TwitterChannel < Channel
 
     def broadcast(finalStr)
 	    client = Twitter::REST::Client.new($clientConf[cityCode])
-	
+
 	    if client
 	       puts "Client ready"
 	       unless $debug
 	         r = client.update(finalStr)
-	
+
 	         if ! r.nil?
 	            puts "Announced!"
 	            puts r.url
 	         else
-	            puts "Annouced failed" 
+	            puts "Annouced failed"
 	         end
-	      else    
+	      else
 	         puts "$debug on, not announcing"
-	      end     
+	      end
 	      puts finalStr
-	    else    
+	    else
 	        $stderr.puts "Client error"
 	        exit 1
 	    end
-	
+
 	    puts "String length is #{finalStr.length}"
     end
 
@@ -51,23 +51,25 @@ class TwitterChannel < Channel
     def generateString
 	    weatherHashTag  = $clientConf[@cityCode]['weatherHashTag']
 	    bikeHashTag     = $clientConf[@cityCode]['bikeHashTag']
-	
+
 	    twitterMaxChars = 280
 	    finalStr = '#' * (twitterMaxChars + 10)
 	    attempt=0
 
         untilDateTime = @analysis.untilDateTime
 
+        byebug
         analysisToStringsArray = @analysis.to_s.split("\n")
-        bodyStr = analysisToStringsArray[0]
-        popStr = analysisToStringsArray[1] or ''
+        tmpStr = analysisToStringsArray[0]
+        popSumStr = analysisToStringsArray[1] or ''
+        popStr = ''
         windStr = ''
         windTimes = ''
-	
+
 	    while(finalStr.length >= twitterMaxChars)
 	        puts "#{finalStr.length} chars: #{finalStr}" if $debug
 	        attempt+=1
-	
+
 	        case attempt
 	        when 1
 	            announceStr = "Your #{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%k:%M').strip}: "
@@ -86,7 +88,7 @@ class TwitterChannel < Channel
 		        popStr=''
                 forecasts = @analysis.allPredictions
 			    forecasts.each { |f|
-	                finalStr = announceStr + bodyStr + windStr + popStr + windTimes
+	                finalStr = announceStr + tmpStr + windStr + popStr + windTimes
 		            strLength = finalStr.length
 				    if f.pop >= 30
 				        i += 1
@@ -100,14 +102,11 @@ class TwitterChannel < Channel
 				        end
 			        end
 		        }
-	        when 20
-	            windChillLabel = minTemp < 10 ? 'Wc' : 'T'
-		        bodyStr="Current/Worst: #{windChillLabel}: #{current.windChill}/#{minWindChill}, P: #{current.pcpType}/#{maxPop}; S: #{sunset}\n"
 	        when 100
 	            finalStr = finalStr[0,twitterMaxChars-1]
 	        end
-	
-	        finalStr = (announceStr.chomp + "\n" + bodyStr.chomp + "\n" + windStr + popStr + windTimes).strip
+
+	        finalStr = (announceStr.chomp + "\n" + tmpStr.chomp + "\n" + windStr + popSumStr + popStr + windTimes).strip
         end
 
         return finalStr

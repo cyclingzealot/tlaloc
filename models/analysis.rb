@@ -9,14 +9,14 @@ class Analysis
     attr_reader :temperatureMin
     attr_reader :temperatureMax
     attr_reader :popMax
-    
+
     attr_reader :untilDateTime
 
     def initialize(currentPrediction, futurePredictions)
         # Doublecheck location of predictions against currentPrediction
         raise "Not all predictions from same location" if ! futurePredictions.all? { |p|
             p.location == currentPrediction.location
-        } 
+        }
 
         @currentPrediction = currentPrediction
         @futurePredictions = futurePredictions
@@ -34,15 +34,15 @@ class Analysis
 
     def calcWorstCases()
 		@popMax=@futurePredictions.max_by {|f|
-		    f.pop   
+		    f.pop
 		}.pop
-		
+
 		@windChillMin=@futurePredictions.min_by {|f| f.windChill}.windChill
-		
+
 		@temperatureMin = @futurePredictions.min_by {|f| f.temp}.temp
-		@temperatureMax = @futurePredictions.max_by {|f| f.temp}.temp 
-		
-		@untilDateTime=(@futurePredictions.max_by {|f| f.dateTime}.dateTime) + 1*60*60 
+		@temperatureMax = @futurePredictions.max_by {|f| f.temp}.temp
+
+		@untilDateTime=(@futurePredictions.max_by {|f| f.dateTime}.dateTime) + 1*60*60
     end
 
     def untilHour
@@ -56,7 +56,9 @@ class Analysis
 
     def to_s
         windChillLabel = @windChillMin < 10 ? 'Windchill' : 'Temperature'
-        bodyStr="Current/Worst: #{windChillLabel}: #{@currentPrediction.windChill()}/#{@windChillMin}, POP: #{@currentPrediction.pcpType}/#{@popMax}; Sunset: #{self.sunset().strftime("%H:%M")}\n"
+        tmpStr="#{windChillLabel}: #{@currentPrediction.windChill()}/#{@windChillMin}"
+        popSumStr="POP: #{@currentPrediction.pcpType}/#{@popMax}"
+        sunsetStr="Sunset: #{self.sunset().strftime("%H:%M")}\n"
 
         # Get the POP for each prediction (including the current one) and develop it into a string
         popStr=''
@@ -75,7 +77,7 @@ class Analysis
         windStr = ''
         windTimes = ''
 
-        (bodyStr.chomp + "\n" + popStr.chomp).chomp
+        (tmpStr.chomp + "\n" + popSumStr.chomp + "\n" + popStr.chomp + "\n" + sunsetStr.chomp).chomp
     end
 
 

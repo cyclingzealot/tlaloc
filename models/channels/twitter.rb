@@ -71,11 +71,11 @@ class TwitterChannel < Channel
 
 	        case attempt
 	        when 1
-	            announceStr = "Your #{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%k:%M').strip}: "
+	            announceStr = "Your #{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%k:%M').strip} "
 	        when 2
-	            announceStr = "#{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%k:%M').strip}: "
+	            announceStr = "#{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%k:%M').strip} "
 	        when 3
-	            announceStr = "#{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%l%P').strip}: "
+	            announceStr = "#{bikeHashTag} #{weatherHashTag} until #{untilDateTime.strftime('%l%P').strip} "
 	        when 4
 	            popStr.strip!
 	            popStr.gsub!(/;$/, '')
@@ -104,6 +104,8 @@ class TwitterChannel < Channel
 	        when 100
 	            finalStr = finalStr[0,twitterMaxChars-1]
 	        end
+
+            announceStr = announceStr.chomp + "(Current / Worst):"
 
 	        finalStr = (announceStr.chomp + "\n" + tmpStr.chomp + "\n" + windStr + popSumStr + popStr + windTimes).strip
         end

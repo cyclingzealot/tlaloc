@@ -63,7 +63,7 @@ class TwitterChannel < Channel
         popSumStr = analysisToStringsArray[1] or ''
         popStr = analysisToStringsArray[2]
         sunsetStr = analysisToStringsArray[3]
-        windStr = ''
+        windStr = analysisToStringsArray[4]
         windTimes = ''
 
 	    while(finalStr.length >= twitterMaxChars)
@@ -109,7 +109,7 @@ class TwitterChannel < Channel
 	            finalStr = finalStr[0,twitterMaxChars-1]
 	        end
 
-	        finalStr = (announceStr.chomp + "\n" + tmpStr.chomp + "\n" + popSumStr + "\n" + sunsetStr.strip + "\n" + popStr.strip + "\n"  + windStr + windTimes).strip if attempt < 100
+	        finalStr = (announceStr.chomp + "\n" + tmpStr.chomp + "\n" + popSumStr + "\n" + sunsetStr.strip + "\n" + popStr.strip + "\n"  + windStr + windTimes).gsub(/[\r\n]{2}/, "\n").strip if attempt < 100
         end
 
         return finalStr

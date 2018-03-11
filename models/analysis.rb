@@ -4,6 +4,7 @@ class Analysis
     attr_reader :currentPrediction
 
     attr_reader :humidexMax
+    attr_reader :windMax
     attr_reader :maxPop
     attr_reader :windChillMin
     attr_reader :temperatureMin
@@ -25,7 +26,7 @@ class Analysis
     end
 
     def allPredictions
-        [@currentPrediction] + [@futurePredictions]
+        [@currentPrediction] + @futurePredictions
     end
 
     def location
@@ -33,14 +34,15 @@ class Analysis
     end
 
     def calcWorstCases()
-		@popMax=@futurePredictions.max_by {|f|
+		@popMax=self.allPredictions.max_by {|f|
 		    f.pop
 		}.pop
 
-		@windChillMin=@futurePredictions.min_by {|f| f.windChill}.windChill
+        @windMax = self.allPredictions.max_by {|f| f.wind}.wind
+		@windChillMin=self.allPredictions.min_by {|f| f.windChill}.windChill
 
-		@temperatureMin = @futurePredictions.min_by {|f| f.temp}.temp
-		@temperatureMax = @futurePredictions.max_by {|f| f.temp}.temp
+		@temperatureMin = self.allPredictions.min_by {|f| f.temp}.temp
+		@temperatureMax = self.allPredictions.max_by {|f| f.temp}.temp
 
 		@untilDateTime=(@futurePredictions.max_by {|f| f.dateTime}.dateTime) + 1*60*60
     end
@@ -59,6 +61,7 @@ class Analysis
         tmpStr="#{windChillLabel}: #{@currentPrediction.windChill()}/#{@windChillMin}"
         popSumStr="POP: #{@currentPrediction.pcpType}/#{@popMax}"
         sunsetStr="Sunset: #{self.sunset().strftime("%H:%M")}\n"
+        windStr="Wind: #{@currentPrediction.wind}/#{@windMax}\n"
 
         # Get the POP for each prediction (including the current one) and develop it into a string
         popStr=''
@@ -74,10 +77,9 @@ class Analysis
             end
         }
 
-        windStr = ''
         windTimes = ''
 
-        (tmpStr.chomp + "\n" + popSumStr.chomp + "\n" + popStr.chomp + "\n" + sunsetStr.chomp).chomp
+        (tmpStr.strip + "\n" + popSumStr.strip + "\n" + windStr.strip + "\n" + popStr.strip + "\n" + sunsetStr.strip).strip
     end
 
 

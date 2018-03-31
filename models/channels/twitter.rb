@@ -58,12 +58,12 @@ class TwitterChannel < Channel
 
         untilDateTime = @analysis.untilDateTime
 
-        analysisToStringsArray = @analysis.to_s.split("\n")
-        tmpStr = analysisToStringsArray[0]
-        popSumStr = analysisToStringsArray[1] or ''
-        popStr = analysisToStringsArray[2]
-        sunsetStr = analysisToStringsArray[3]
-        windStr = analysisToStringsArray[4]
+        tmpStr = @analysis.tmpStr
+        popSumStr = @analysis.popSumStr
+        popStr = @analysis.popTimesStr
+        sunsetStr = @analysis.sunsetStr
+        gustStr = @analysis.gustStr
+        windStr = @analysis.windStr
         windTimes = ''
 
 	    while(finalStr.length >= twitterMaxChars)
@@ -109,7 +109,7 @@ class TwitterChannel < Channel
 	            finalStr = finalStr[0,twitterMaxChars-1]
 	        end
 
-	        finalStr = (announceStr.chomp + "\n" + tmpStr.chomp + "\n" + popSumStr + "\n" + sunsetStr.strip + "\n" + popStr.strip + "\n"  + windStr + windTimes).gsub(/[\r\n]{2}/, "\n").strip if attempt < 100
+	        finalStr = [announceStr, tmpStr, popSumStr,  popStr, windStr, gustStr, sunsetStr, windTimes].map{|s| s.strip}.select{|s| not s.empty?}.join("\n").gsub(/[\r\n]{2}/, "\n").strip if attempt < 100
         end
 
         return finalStr

@@ -25,7 +25,7 @@ class TwitterChannel < Channel
 
 	    if client
 	       puts "Client ready"
-	       unless $debug
+	       unless $debug or $devOffLine
 	         r = client.update(finalStr)
 
 	         if ! r.nil?
@@ -35,7 +35,7 @@ class TwitterChannel < Channel
 	            puts "Annouced failed"
 	         end
 	      else
-	         puts "$debug on, not announcing"
+	         puts "$debug or $devOffLine on, not announcing"
 	      end
 	      puts finalStr
 	    else

@@ -104,6 +104,7 @@ class Analysis
 
         windTimes = ''
 
+        # COuld be refactored into a common fuctnion called assembleStrings?
         [tmpStr.strip, popSumStr.strip, windStr.strip, gustStr.strip, popTimesStr.strip,  sunsetStr.strip].select {|s| not s.empty?}.join("\n").strip
     end
 

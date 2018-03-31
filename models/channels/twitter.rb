@@ -109,6 +109,7 @@ class TwitterChannel < Channel
 	            finalStr = finalStr[0,twitterMaxChars-1]
 	        end
 
+            # COuld be refactored into a common fuctnion called assembleString?
 	        finalStr = [announceStr, tmpStr, popSumStr,  popStr, windStr, gustStr, sunsetStr, windTimes].map{|s| s.strip}.select{|s| not s.empty?}.join("\n").gsub(/[\r\n]{2}/, "\n").strip if attempt < 100
         end
 

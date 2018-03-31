@@ -14,6 +14,7 @@ class Prediction
 
     attr_accessor :temp
     attr_accessor :wind
+    attr_accessor :gust
     attr_accessor :pcpType
     attr_accessor :pop
     attr_accessor :dateTime

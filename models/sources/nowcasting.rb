@@ -32,11 +32,11 @@ class Nowcasting
 		# Take 7th line of data (12th line of output) for the line representing
 		# current observation
 		currentLine=data.split("\n")[11]
-		
+
 		current = Nowcasting::createPrediction(currentLine, location)
-		
+
 		forecastStrings=data.split("\n")
-		
+
 		forecasts = forecastStrings[11..forecastStrings.size-1].map { |l|
 		    next if l[0] == '-'
 		    Nowcasting::createPrediction(l, location)
@@ -51,10 +51,11 @@ class Nowcasting
 
 		p = Prediction.new(location, dateTimeStr)
 
-        
+
         p.temp = parts[12].strip.to_i
         p.pcpType = parts[3].strip
         p.wind = parts[15].strip.to_i
+        p.gust = parts[16].strip.to_i
 
 
         # TODO: Parse a time zone here?
@@ -71,6 +72,6 @@ class Nowcasting
         ].max
 
         return p
-        
+
     end
 end

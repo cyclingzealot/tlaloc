@@ -39,6 +39,7 @@ class Analysis
 		}.pop
 
         @windMax = self.allPredictions.max_by {|f| f.wind}.wind
+        @gustMax = self.allPredictions.max_by {|f| f.gust}.gust
 		@windChillMin=self.allPredictions.min_by {|f| f.windChill}.windChill
 
 		@temperatureMin = self.allPredictions.min_by {|f| f.temp}.temp
@@ -62,6 +63,7 @@ class Analysis
         popSumStr="POP: #{@currentPrediction.pcpType}/#{@popMax}"
         sunsetStr="Sunset: #{self.sunset().strftime("%H:%M")}\n"
         windStr="Wind: #{@currentPrediction.wind}/#{@windMax}\n"
+        gustStr="Gusts: #{@currentPrediction.gust}/#{@gustMax}\n"
 
         # Get the POP for each prediction (including the current one) and develop it into a string
         popStr=''
@@ -79,7 +81,7 @@ class Analysis
 
         windTimes = ''
 
-        (tmpStr.strip + "\n" + popSumStr.strip + "\n" + windStr.strip + "\n" + popStr.strip + "\n" + sunsetStr.strip).strip
+        [tmpStr.strip, popSumStr.strip, windStr.strip, gustStr.strip, popStr.strip,  sunsetStr.strip].join("\n").strip
     end
 
 

@@ -15,7 +15,9 @@ $cacheConf = { 'sunset' => {
 
 $devOffLine = false
 if $devOffLine #and `lynx --dump 'http://www.google.ca' 2>&1`.include?("Unable to connect")
-    $cacheConf['matrixList']['fileLocation'] = `echo $PWD`.chomp + '/dataSamples/dd.weather.gc.ca/nowcasting/matrices/SCRIBE.NWCSTG.01.20.13Z.n'
+    samplePath = `echo $PWD`.chomp + '/dataSamples/dd.weather.gc.ca/nowcasting/matrices/SCRIBE.NWCSTG.01.20.13Z.n'
+    $cacheConf['matrixList']['fileLocation'] = samplePath
+    $stderr.puts "Using #{samplePath} because $devOffLine = true"
 end
 
 $cacheStore        = "/tmp/tlaloc/"

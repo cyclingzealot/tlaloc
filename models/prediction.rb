@@ -4,9 +4,9 @@ require 'active_support/time'
 
 
 ########################################################################
-# A prediction has a date & time, a time zone and a location 
+# A prediction has a date & time, a time zone and a location
 # Maybe it will have a duration too?
-# 
+#
 # A prediction can be generated from any source (nowcasting, forecasts, etc.)
 # A prediction could be a current readout of wheather predictions
 ########################################################################
@@ -35,11 +35,11 @@ class Prediction
 	    @dateTime = nil
 	    @location = location
 
-        # REARCH: The rest is in Nowcasting::createPrediction 
+        # REARCH: The rest is in Nowcasting::createPrediction
 	    # From the 7th line (current), record the temperature (14th column T) and precipiration (5th column)
 	    # See http://dd.weather.gc.ca/nowcasting/doc/README_nowcasting_prevision-immediate.txt
         #parts = line.split('|')
-	#	
+	    #
         #@temp = parts[12].strip.to_i
         #@pcpType = parts[3].strip
         #@wind = parts[15].strip.to_i
@@ -96,11 +96,11 @@ class Prediction
     end
 
     def dateTime()
-        return @dateTime.in_time_zone(@zone)
+        return @dateTime.in_time_zone(@location.timezone)
     end
 
     def hour()
-        return @dateTime.in_time_zone(@zone).hour
+        return @dateTime.in_time_zone(@location.timezone).hour
     end
 
 

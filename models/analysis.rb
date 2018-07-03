@@ -75,7 +75,7 @@ class Analysis
     end
 
     def tmpStr
-        "#{windChillLabel}: #{@currentPrediction.windChill()}/#{@windChillMin}"
+        "#{windChillLabel}: #{@currentPrediction.windChill()}/#{self.worstTemp()}"
     end
 
     def windChillLabel

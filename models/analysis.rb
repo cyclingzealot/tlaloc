@@ -14,6 +14,8 @@ class Analysis
 
     attr_reader :untilDateTime
 
+    MAX_COMFORT_ZONE = 18
+
     def initialize(currentPrediction, futurePredictions)
         # Doublecheck location of predictions against currentPrediction
         raise "Not all predictions from same location" if ! futurePredictions.all? { |p|
@@ -54,7 +56,7 @@ class Analysis
     end
 
     def worstTemp
-        return @temperatureMax if @windChillMin >= 20
+        return @temperatureMax if @windChillMin >= self.class::MAX_COMFORT_ZONE
         return @windChillMin
     end
 
